@@ -1,6 +1,6 @@
 # HSGuru-Chinese-Plus
 
-> 当前版本：v1.1
+> 当前版本：v2.1.0
 
 ---
 
@@ -56,6 +56,13 @@ HSGuru-Chinese-Plus 是一款 ScriptCat / Tampermonkey 用户脚本，适用于 
 
 ---
 
+### 从 Release 下载
+
+前往 [Releases](../../releases) 页面，下载最新版本的 `hsguru-chinese-plus.js`，在脚本管理器中新建脚本并粘贴内容即可。
+
+---
+
+
 ### 安装步骤（以 ScriptCat 为例）
 
 1. 安装 ScriptCat 扩展  
@@ -68,6 +75,70 @@ HSGuru-Chinese-Plus 是一款 ScriptCat / Tampermonkey 用户脚本，适用于 
 
 4. 访问网站：  
    https://www.hsguru.com/
+
+---
+
+## 🔨 构建说明
+
+### 开发环境
+
+- **Node.js** >= 18
+- **npm** >= 9
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式
+
+启动 Vite 开发服务器，支持热更新：
+
+```bash
+pnpm run dev
+```
+
+### 构建打包
+
+执行 TypeScript 类型检查 + Vite 构建，产物输出到 `dist/` 目录：
+
+```bash
+pnpm run build
+```
+
+构建产物为 `dist/hsguru-chinese-plus.js`，可直接导入脚本管理器使用。
+
+### 项目结构
+
+```
+src/
+├── main.ts                    # 入口：初始化、Observer、事件监听
+├── features/                  # 功能模块
+│   ├── cardTranslation.ts     # 卡牌名称翻译
+│   ├── cardPreview.ts         # 卡牌悬浮预览
+│   ├── deckTranslation.ts     # 卡组名称翻译
+│   ├── configModal.ts         # 配置面板
+│   └── ...
+├── utils/                     # 工具模块
+│   ├── api.ts                 # API 请求队列管理
+│   ├── translationCache.ts    # 翻译缓存（LRU + localStorage）
+│   ├── storage.ts             # 分层存储管理器
+│   ├── constants.ts           # 常量定义
+│   └── ...
+└── types/                     # 类型声明
+    └── index.d.ts
+```
+
+### 版本发布
+
+推送 `v*` 格式的 tag 即可自动触发 GitHub Actions 构建并发布 Release：
+
+```bash
+# 更新 vite.config.ts 中的 version 后
+git tag v2.1.0
+git push origin v2.1.0
+```
 
 ---
 

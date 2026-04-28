@@ -1,0 +1,15 @@
+export { handleAd } from './adRemover';
+export { handleScrollTop } from './scrollTop';
+export { handleClipboard } from './clipboardEnhancer';
+export { handleCardLinks } from './cardLinkRemover';
+export { handleBasic } from './basicTranslation';
+export { handleFilter } from './filterTranslation';
+export { handleSearch } from './searchTranslation';
+export { handleTag } from './tagTranslation';
+export { handleCard } from './cardTranslation';
+export { handleDeck, generateDeckTranslation, getFullPrefixRules } from './deckTranslation';
+export { handleTable } from './tableHandler';
+export { handleFilterStyle } from './filterStyleHandler';
+export { handleTitle, handleSub } from './titleHandler';
+export { showChineseCardPreview, moveChineseCardPreview, hideChineseCardPreview, renderChineseCardPreview, activeCardPreviewName } from './cardPreview';
+export { createConfigModal, addConfigButton, getConfig, applyConfig, initializeFeatures, loadConfigToUI, showConfigModal } from './configModal';
