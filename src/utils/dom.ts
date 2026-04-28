@@ -1,4 +1,9 @@
-import { CLASS_ACCENT_COLORS, DEFAULT_CLASS_ACCENT, DEFAULT_CLASS_BG, CLASS_BG_COLORS } from './constants';
+import {
+  CLASS_ACCENT_COLORS,
+  DEFAULT_CLASS_ACCENT,
+  DEFAULT_CLASS_BG,
+  CLASS_BG_COLORS,
+} from './constants';
 
 // ============================================================
 // Query Cache
@@ -63,24 +68,18 @@ export function getMappedClassValue(
   mapping: Record<string, string>,
   fallback: string,
 ): string {
-  const className = Object.keys(mapping).find((name) =>
-    element.classList.contains(name),
-  );
+  const className = Object.keys(mapping).find((name) => element.classList.contains(name));
   return mapping[className!] || fallback;
 }
 
 export function applyClassAccentStyles(element: HTMLElement): void {
-  const accent = getMappedClassValue(
-    element,
-    CLASS_ACCENT_COLORS,
-    DEFAULT_CLASS_ACCENT,
-  );
-  const bg = getMappedClassValue(
-    element,
-    CLASS_BG_COLORS,
-    DEFAULT_CLASS_BG,
-  );
+  const accent = getMappedClassValue(element, CLASS_ACCENT_COLORS, DEFAULT_CLASS_ACCENT);
+  const bg = getMappedClassValue(element, CLASS_BG_COLORS, DEFAULT_CLASS_BG);
   element.style.setProperty('--hsguru-class-accent', accent);
-  element.style.setProperty('background', `linear-gradient(0deg, ${bg}, ${bg}), #f7edcf`, 'important');
+  element.style.setProperty(
+    'background',
+    `linear-gradient(0deg, ${bg}, ${bg}), #f7edcf`,
+    'important',
+  );
   element.style.setProperty('border-left', `5px solid ${accent}`, 'important');
 }

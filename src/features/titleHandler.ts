@@ -9,9 +9,7 @@ export function handleTitle(): void {
   const titleElement = document.querySelector('div.title.is-2');
   if (!titleElement) return;
 
-  const currentPath = window.location.href
-    .replace(BASE_URL, '')
-    .split('?')[0];
+  const currentPath = window.location.href.replace(BASE_URL, '').split('?')[0];
   const text = titleElement.textContent?.trim() || '';
 
   function handleDeckNameTranslation(match: RegExpMatchArray | null): boolean {
@@ -80,9 +78,7 @@ export function handleTitle(): void {
 }
 
 export function handleSub(): void {
-  const subtitleElement = document.querySelector(
-    'div.subtitle.is-6, div.subtitle.is-5',
-  );
+  const subtitleElement = document.querySelector('div.subtitle.is-6, div.subtitle.is-5');
   if (!subtitleElement) return;
 
   const currentUrl = window.location.href;
@@ -91,9 +87,10 @@ export function handleSub(): void {
     decks: {
       pattern: new RegExp(`^${BASE_URL}decks(\\?|$)`),
       handler: (element) => {
-        const timeSpan = Array.from(element.querySelectorAll('span')).find(
-          (span) => span.textContent?.includes('ago'),
-        ) || null;
+        const timeSpan =
+          Array.from(element.querySelectorAll('span')).find((span) =>
+            span.textContent?.includes('ago'),
+          ) || null;
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const subtitleHTML = `<a href="/stats/explanation">数据说明</a>${timeText}|要做出贡献，请使用 <a href="${API.FIRESTONE}" target="_blank">火石</a> 或 <a target="_blank" href="/hdt-plugin">HDT 插件</a>`;
         replaceSubtitle(element, subtitleHTML);
@@ -102,9 +99,10 @@ export function handleSub(): void {
     meta: {
       pattern: new RegExp(`^${BASE_URL}meta(\\?|$)`),
       handler: (element) => {
-        const timeSpan = Array.from(element.querySelectorAll('span')).find(
-          (span) => span.textContent?.includes('ago'),
-        ) || null;
+        const timeSpan =
+          Array.from(element.querySelectorAll('span')).find((span) =>
+            span.textContent?.includes('ago'),
+          ) || null;
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const subtitleHTML = `要做出贡献，请使用 <a href="${API.FIRESTONE}" target="_blank">火石</a> 或 <a target="_blank" href="/hdt-plugin">HDT 插件</a>${timeText}`;
         replaceSubtitle(element, subtitleHTML);
@@ -122,11 +120,21 @@ export function handleSub(): void {
       handler: (element) => {
         const timeSpan = element.querySelector('span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
-        const editLink = element.querySelector(`a[href*="${ROUTES.DECK_BUILDER}"]`) as HTMLAnchorElement | null;
-        const cardStatsLink = element.querySelector(`a[href*="${ROUTES.CARD_STATS}"]`) as HTMLAnchorElement | null;
-        const archetypeLink = element.querySelector(`a[href*="${ROUTES.ARCHETYPE}"]`) as HTMLAnchorElement | null;
-        const replaysLink = element.querySelector(`a[href*="${ROUTES.REPLAYS_WITH_URL}"]`) as HTMLAnchorElement | null;
-        const replaysByArchLink = element.querySelector(`a[href*="${ROUTES.REPLAYS_BY_ARCHETYPE}"]`) as HTMLAnchorElement | null;
+        const editLink = element.querySelector(
+          `a[href*="${ROUTES.DECK_BUILDER}"]`,
+        ) as HTMLAnchorElement | null;
+        const cardStatsLink = element.querySelector(
+          `a[href*="${ROUTES.CARD_STATS}"]`,
+        ) as HTMLAnchorElement | null;
+        const archetypeLink = element.querySelector(
+          `a[href*="${ROUTES.ARCHETYPE}"]`,
+        ) as HTMLAnchorElement | null;
+        const replaysLink = element.querySelector(
+          `a[href*="${ROUTES.REPLAYS_WITH_URL}"]`,
+        ) as HTMLAnchorElement | null;
+        const replaysByArchLink = element.querySelector(
+          `a[href*="${ROUTES.REPLAYS_BY_ARCHETYPE}"]`,
+        ) as HTMLAnchorElement | null;
         const subtitleHTML = `
           <a href="${editLink?.href || '#'}">编辑</a> |
           <a href="${cardStatsLink?.href || '#'}">卡牌统计(调度)</a> |
@@ -144,8 +152,12 @@ export function handleSub(): void {
         const timeSpan = element.querySelector('span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
-        const deckDetailLink = element.querySelector(`a[href*="${ROUTES.DECK_DETAIL}"]`) as HTMLAnchorElement | null;
-        const cardStatsByArchLink = element.querySelector(`a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`) as HTMLAnchorElement | null;
+        const deckDetailLink = element.querySelector(
+          `a[href*="${ROUTES.DECK_DETAIL}"]`,
+        ) as HTMLAnchorElement | null;
+        const cardStatsByArchLink = element.querySelector(
+          `a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`,
+        ) as HTMLAnchorElement | null;
         const subtitleHTML = `
           <a href="${deckDetailLink?.href || '#'}">卡组统计</a> |
           <a href="${cardStatsByArchLink?.href || '#'}">卡组类型卡牌统计</a> |
@@ -162,8 +174,12 @@ export function handleSub(): void {
         const timeSpan = element.querySelector('span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
-        const cardStatsQueryLink = element.querySelector(`a[href*="${ROUTES.CARD_STATS_QUERY}"]`) as HTMLAnchorElement | null;
-        const archetypeLink = element.querySelector(`a[href*="${ROUTES.ARCHETYPE}"]`) as HTMLAnchorElement | null;
+        const cardStatsQueryLink = element.querySelector(
+          `a[href*="${ROUTES.CARD_STATS_QUERY}"]`,
+        ) as HTMLAnchorElement | null;
+        const archetypeLink = element.querySelector(
+          `a[href*="${ROUTES.ARCHETYPE}"]`,
+        ) as HTMLAnchorElement | null;
         const subtitleHTML = `
           <a href="${cardStatsQueryLink?.href || '#'}">卡组卡牌统计</a> |
           <a href="${archetypeLink?.href || '#'}">卡组类型统计</a> |
@@ -179,9 +195,15 @@ export function handleSub(): void {
       handler: (element) => {
         const timeSpan = element.querySelector('span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
-        const cardStatsByArchLink = element.querySelector(`a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`) as HTMLAnchorElement | null;
-        const decksQueryLink = element.querySelector(`a[href*="${ROUTES.DECKS_QUERY}"]`) as HTMLAnchorElement | null;
-        const replaysQueryLink = element.querySelector(`a[href*="${ROUTES.REPLAYS_QUERY}"]`) as HTMLAnchorElement | null;
+        const cardStatsByArchLink = element.querySelector(
+          `a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`,
+        ) as HTMLAnchorElement | null;
+        const decksQueryLink = element.querySelector(
+          `a[href*="${ROUTES.DECKS_QUERY}"]`,
+        ) as HTMLAnchorElement | null;
+        const replaysQueryLink = element.querySelector(
+          `a[href*="${ROUTES.REPLAYS_QUERY}"]`,
+        ) as HTMLAnchorElement | null;
         const subtitleHTML = `
           <a href="${cardStatsByArchLink?.href || '#'}">卡牌统计</a> |
           <a href="${decksQueryLink?.href || '#'}">卡组</a> |
@@ -216,7 +238,9 @@ export function handleSub(): void {
     leaderboardPoints: {
       pattern: new RegExp(`^${BASE_URL}leaderboard/points`),
       handler: (element) => {
-        const announcementLink = element.querySelector(`a[href*="${API.BLIZZARD}"]`) as HTMLAnchorElement | null;
+        const announcementLink = element.querySelector(
+          `a[href*="${API.BLIZZARD}"]`,
+        ) as HTMLAnchorElement | null;
         const href = announcementLink ? announcementLink.href : '#';
         const subtitleHTML = `<a href="${href}" target="_blank">2026 公告<span class="icon is-small">
   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="icon w-6 h-6">
@@ -231,7 +255,9 @@ export function handleSub(): void {
       handler: (element) => {
         const timeElement = element.querySelector('time');
         const timeHTML = timeElement ? timeElement.outerHTML : '';
-        const blizzardLink = element.querySelector(`a[href*="${API.BLIZZARD}"]`) as HTMLAnchorElement | null;
+        const blizzardLink = element.querySelector(
+          `a[href*="${API.BLIZZARD}"]`,
+        ) as HTMLAnchorElement | null;
         const subtitleHTML = `
           <a target="_blank" href="${ROUTES.LEADERBOARD_PLAYER_STATS}">统计</a> |
           <a target="_blank" href="${blizzardLink?.href || '#'}">官方网站</a> |

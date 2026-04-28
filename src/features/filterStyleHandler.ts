@@ -49,19 +49,14 @@ const listConfigs = {
   ],
 };
 
-function applyFilterIcons(
-  root: Element,
-  lists: string[][],
-): void {
+function applyFilterIcons(root: Element, lists: string[][]): void {
   const textToList = new Map<string, string[]>();
   lists.forEach((list) => {
     list.forEach((text) => {
       textToList.set(text, list);
     });
   });
-  const filterNodes = root.querySelectorAll(
-    '.has-dropdown > a.button, a.dropdown-item',
-  );
+  const filterNodes = root.querySelectorAll('.has-dropdown > a.button, a.dropdown-item');
   filterNodes.forEach((node) => {
     const text = node.textContent?.trim() || '';
     if (textToList.has(text)) {
@@ -69,9 +64,7 @@ function applyFilterIcons(
       if (node.matches('.has-dropdown > a.button')) {
         node.classList.add('button-with-icon');
       }
-      node.classList.add(
-        `class-${text.toLowerCase().replace(/\s+/g, '-')}`,
-      );
+      node.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
     }
   });
 }
@@ -124,35 +117,25 @@ function createFilterContainer({
     });
   });
   controls.forEach((control) => {
-    const button = control.matches('a.button')
-      ? control
-      : control.querySelector('a.button');
+    const button = control.matches('a.button') ? control : control.querySelector('a.button');
     if (button) {
       const text = button.textContent?.trim() || '';
       if (textToList.has(text)) {
         button.classList.add('class-icon', 'button-with-icon');
-        button.classList.add(
-          `class-${text.toLowerCase().replace(/\s+/g, '-')}`,
-        );
+        button.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
       }
     }
-    const dropdownItems = Array.from(
-      control.querySelectorAll('a.dropdown-item'),
-    );
+    const dropdownItems = Array.from(control.querySelectorAll('a.dropdown-item'));
     dropdownItems.forEach((item) => {
       const text = item.textContent?.trim() || '';
       if (textToList.has(text)) {
         item.classList.add('class-icon');
-        item.classList.add(
-          `class-${text.toLowerCase().replace(/\s+/g, '-')}`,
-        );
+        item.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
       }
     });
-    control
-      .querySelectorAll('a.button, button.button, a.dropdown-item')
-      .forEach((button) => {
-        button.classList.add('hsguru-filter-button');
-      });
+    control.querySelectorAll('a.button, button.button, a.dropdown-item').forEach((button) => {
+      button.classList.add('hsguru-filter-button');
+    });
     if (control.matches('button.button')) {
       control.classList.add('hsguru-filter-button');
     }
@@ -175,9 +158,7 @@ const pageHandlers: Array<{
     },
   },
   {
-    urlPattern: new RegExp(
-      `^${BASE_URL}deck/(\\d+|[A-Za-z0-9+/=%]+)(?:\\?.*)?$`,
-    ),
+    urlPattern: new RegExp(`^${BASE_URL}deck/(\\d+|[A-Za-z0-9+/=%]+)(?:\\?.*)?$`),
     handler: () => {
       createFilterContainer({
         targetSelector: '.table.is-fullwidth.is-striped',
@@ -188,9 +169,7 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}meta(\\?|$)`),
     handler: () => {
-      const table = document.querySelector(
-        'table.table.is-fullwidth.is-striped.is-narrow',
-      );
+      const table = document.querySelector('table.table.is-fullwidth.is-striped.is-narrow');
       if (table) {
         const parentDiv = table.parentNode as Element;
         if (parentDiv) {
@@ -254,34 +233,26 @@ const pageHandlers: Array<{
       if (!toolbar) return;
       toolbar.classList.add('filters-container', CLASSES.STREAMER_FILTERS);
       toolbar.classList.remove('is-pulled-left');
-      applyFilterIcons(toolbar, [
-        listConfigs.format,
-        listConfigs.rank,
-        listConfigs.class,
-      ]);
+      applyFilterIcons(toolbar, [listConfigs.format, listConfigs.rank, listConfigs.class]);
     },
   },
   {
     urlPattern: new RegExp(`^${BASE_URL}leaderboard(?:[/?].*)?$`),
     handler: () => {
       const toolbars = new Set<Element>();
-      document
-        .querySelectorAll('.level.level-left')
-        .forEach((toolbar) => {
-          if (
-            toolbar.querySelector('.dropdown') &&
-            toolbar.querySelector('a.button, span.button, button.button')
-          ) {
-            toolbars.add(toolbar);
-          }
-        });
-      document
-        .querySelectorAll(`form[action^='/leaderboard']`)
-        .forEach((form) => {
-          if (form.querySelector('.dropdown')) {
-            toolbars.add(form);
-          }
-        });
+      document.querySelectorAll('.level.level-left').forEach((toolbar) => {
+        if (
+          toolbar.querySelector('.dropdown') &&
+          toolbar.querySelector('a.button, span.button, button.button')
+        ) {
+          toolbars.add(toolbar);
+        }
+      });
+      document.querySelectorAll(`form[action^='/leaderboard']`).forEach((form) => {
+        if (form.querySelector('.dropdown')) {
+          toolbars.add(form);
+        }
+      });
       toolbars.forEach((toolbar) => {
         if ((toolbar as HTMLElement).dataset.hsguruLeaderboardFiltersStyled === 'true') {
           return;
@@ -289,38 +260,32 @@ const pageHandlers: Array<{
         (toolbar as HTMLElement).dataset.hsguruLeaderboardFiltersStyled = 'true';
         toolbar.classList.add('filters-container', CLASSES.LEADERBOARD_FILTERS);
         if (toolbar.tagName === 'FORM') {
-          toolbar
-            .querySelectorAll('span.button.is-link, a.button.is-link')
-            .forEach((button) => {
-              button.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
-            });
+          toolbar.querySelectorAll('span.button.is-link, a.button.is-link').forEach((button) => {
+            button.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
+          });
         } else {
-          toolbar
-            .querySelectorAll(':scope > form.filters-container')
-            .forEach((form) => {
-              form.classList.remove('filters-container', CLASSES.LEADERBOARD_FILTERS);
-              delete (form as HTMLElement).dataset.hsguruLeaderboardFiltersStyled;
-            });
+          toolbar.querySelectorAll(':scope > form.filters-container').forEach((form) => {
+            form.classList.remove('filters-container', CLASSES.LEADERBOARD_FILTERS);
+            delete (form as HTMLElement).dataset.hsguruLeaderboardFiltersStyled;
+          });
           toolbar
             .querySelectorAll(':scope > span.button, :scope > a.button.is-link')
             .forEach((button) => {
               button.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
             });
-          toolbar.querySelectorAll(':scope > form[action^="/leaderboard"]').forEach(
-            (form) => {
-              form.classList.add(CLASSES.LEADERBOARD_SEARCH_FORM);
-              const input = form.querySelector("input.input, input[type='search']");
-              if (input) {
-                input.classList.add(CLASSES.LEADERBOARD_SEARCH_INPUT);
-                if (!input.getAttribute('placeholder')) {
-                  input.setAttribute('placeholder', uiTranslations.get('Search') || '搜索');
-                }
+          toolbar.querySelectorAll(':scope > form[action^="/leaderboard"]').forEach((form) => {
+            form.classList.add(CLASSES.LEADERBOARD_SEARCH_FORM);
+            const input = form.querySelector("input.input, input[type='search']");
+            if (input) {
+              input.classList.add(CLASSES.LEADERBOARD_SEARCH_INPUT);
+              if (!input.getAttribute('placeholder')) {
+                input.setAttribute('placeholder', uiTranslations.get('Search') || '搜索');
               }
-              form.querySelectorAll('a.button.is-link, span.button.is-link').forEach((btn) => {
-                btn.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
-              });
-            },
-          );
+            }
+            form.querySelectorAll('a.button.is-link, span.button.is-link').forEach((btn) => {
+              btn.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
+            });
+          });
         }
       });
       createLeaderboardFilterContainer();
@@ -355,7 +320,11 @@ function createLeaderboardFilterContainer(): void {
 
   const parent = anchor.parentElement;
 
-  if (parent.querySelector(':scope > .filters-container.hsguru-leaderboard-filters[data-hsguru-filter-container=\'true\']')) {
+  if (
+    parent.querySelector(
+      ":scope > .filters-container.hsguru-leaderboard-filters[data-hsguru-filter-container='true']",
+    )
+  ) {
     return;
   }
 
@@ -394,24 +363,22 @@ function createLeaderboardFilterContainer(): void {
   container.dataset.hsguruFilterContainer = 'true';
   container.dataset.hsguruLeaderboardFiltersStyled = 'true';
   controls.forEach((node) => {
-    if (
-      node.matches('a.button.is-link, span.button.is-link, .button.is-link')
-    ) {
+    if (node.matches('a.button.is-link, span.button.is-link, .button.is-link')) {
       node.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
     }
-    if (
-      node.matches(
-        "input.input, input[type='number'], input[type='search'], select",
-      )
-    ) {
+    if (node.matches("input.input, input[type='number'], input[type='search'], select")) {
       node.classList.add(CLASSES.LEADERBOARD_INLINE_INPUT);
     }
     if (node.matches(`form[action^='/leaderboard']`)) {
       const visibleInputs = Array.from(
         node.querySelectorAll("input.input, input[type='number'], input[type='search'], select"),
-      ).filter((input) => (input as HTMLInputElement).type !== 'hidden' && !input.classList.contains('is-hidden'));
+      ).filter(
+        (input) =>
+          (input as HTMLInputElement).type !== 'hidden' && !input.classList.contains('is-hidden'),
+      );
       const searchInput = visibleInputs.find(
-        (input) => input.matches("input[type='search']") || (input as HTMLInputElement).type === 'text',
+        (input) =>
+          input.matches("input[type='search']") || (input as HTMLInputElement).type === 'text',
       );
       if (searchInput) {
         node.classList.add(CLASSES.LEADERBOARD_SEARCH_FORM);

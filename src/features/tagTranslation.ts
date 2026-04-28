@@ -1,9 +1,7 @@
 import { queryCache } from '../utils/dom';
 
 export function handleTag(): void {
-  const tags = Array.from(
-    queryCache.getOrCreate('div.column.tag, a.tag.column.is-link'),
-  );
+  const tags = Array.from(queryCache.getOrCreate('div.column.tag, a.tag.column.is-link'));
   tags.forEach((tag) => {
     const text = tag.textContent?.trim() || '';
 

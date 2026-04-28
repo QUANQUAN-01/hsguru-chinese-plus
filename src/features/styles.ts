@@ -1517,7 +1517,10 @@ export function injectStyles(config?: Record<string, boolean>): void {
   style.textContent = enabledStyles;
 }
 
-function isFeatureEnabled(featureKey: keyof typeof FEATURES, config?: Record<string, boolean>): boolean {
+function isFeatureEnabled(
+  featureKey: keyof typeof FEATURES,
+  config?: Record<string, boolean>,
+): boolean {
   const configKey = `enable_${featureKey}`;
   if (config && Object.prototype.hasOwnProperty.call(config, configKey)) {
     return config[configKey] !== false;

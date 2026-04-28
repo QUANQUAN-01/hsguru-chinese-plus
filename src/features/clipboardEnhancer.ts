@@ -6,17 +6,11 @@ export function handleClipboard(): void {
   const clipboardButtons = document.querySelectorAll('button.clip-btn-value');
   clipboardButtons.forEach((element) => {
     const originalText = element.getAttribute(DATASET.CLIPBOARD_TEXT);
-    if (
-      originalText &&
-      !originalText.startsWith('#') &&
-      !originalText.endsWith('#')
-    ) {
+    if (originalText && !originalText.startsWith('#') && !originalText.endsWith('#')) {
       const deckTitleElement = element
         .closest('.decklist-info')
         ?.querySelector('a.basic-black-text');
-      const deckTitle = deckTitleElement
-        ? deckTitleElement.textContent?.trim() || ''
-        : '';
+      const deckTitle = deckTitleElement ? deckTitleElement.textContent?.trim() || '' : '';
       const modifiedText = `###${deckTitle}\n#\n${originalText}\n#`;
       element.setAttribute(DATASET.CLIPBOARD_TEXT, modifiedText);
     }

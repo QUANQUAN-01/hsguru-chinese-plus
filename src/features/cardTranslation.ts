@@ -1,6 +1,12 @@
 import { SELECTORS } from '../utils/constants';
 import { cardCache, saveCardTranslation, cacheCardImage } from '../utils/translationCache';
-import { enqueueCardFetch, updateCardElement, addPendingElement, isCardPending, CardTranslationResult } from '../utils/api';
+import {
+  enqueueCardFetch,
+  updateCardElement,
+  addPendingElement,
+  isCardPending,
+  CardTranslationResult,
+} from '../utils/api';
 import { StorageManager, storageKey } from '../utils/storage';
 
 const CUSTOM_CARD_TRANSLATIONS_KEY = storageKey.customCard();
@@ -35,7 +41,7 @@ export function saveCustomCardTranslations(translations: Record<string, string>)
 
 export function deleteCustomCardTranslation(original: string): void {
   loadCustomCardTranslations();
-  if (customCardTranslations!.hasOwnProperty(original)) {
+  if (Object.prototype.hasOwnProperty.call(customCardTranslations, original)) {
     delete customCardTranslations![original];
     StorageManager.gm.set(CUSTOM_CARD_TRANSLATIONS_KEY, customCardTranslations);
   }
@@ -43,16 +49,20 @@ export function deleteCustomCardTranslation(original: string): void {
 
 export function addUnmatchedCardName(name: string): void {
   loadCustomCardTranslations();
-  if (/[a-zA-Z]/.test(name) && !customCardTranslations!.hasOwnProperty(name)) {
+  if (
+    /[a-zA-Z]/.test(name) &&
+    !Object.prototype.hasOwnProperty.call(customCardTranslations, name)
+  ) {
     customCardTranslations![name] = '';
-    StorageManager.gm.set(
-      CUSTOM_CARD_TRANSLATIONS_KEY,
-      customCardTranslations,
-    );
+    StorageManager.gm.set(CUSTOM_CARD_TRANSLATIONS_KEY, customCardTranslations);
   }
 }
 
-function handleCardFetchResult(cardName: string, result: CardTranslationResult, elements: Element[]): void {
+function handleCardFetchResult(
+  cardName: string,
+  result: CardTranslationResult,
+  elements: Element[],
+): void {
   if (result.found) {
     saveCardTranslation(cardName, result.translation);
     if (result.imageUrl) {

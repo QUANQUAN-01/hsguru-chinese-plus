@@ -1,13 +1,27 @@
 import { CATEGORIES, FEATURES } from '../utils/constants';
 import { StorageManager, storageKey } from '../utils/storage';
-import { getCustomTranslations, saveCustomTranslation, deleteCustomTranslation, saveCustomTranslations } from './deckTranslation';
-import { getCustomCardTranslations, saveCustomCardTranslation, deleteCustomCardTranslation, saveCustomCardTranslations } from './cardTranslation';
+import {
+  getCustomTranslations,
+  saveCustomTranslation,
+  deleteCustomTranslation,
+  saveCustomTranslations,
+} from './deckTranslation';
+import {
+  getCustomCardTranslations,
+  saveCustomCardTranslation,
+  deleteCustomCardTranslation,
+  saveCustomCardTranslations,
+} from './cardTranslation';
 
 // ============================================================
 // Helper Functions
 // ============================================================
 
-function createTranslationItemElement(original: string, translation: string, type: 'DECK' | 'CARD' = 'DECK'): HTMLElement {
+function createTranslationItemElement(
+  original: string,
+  translation: string,
+  type: 'DECK' | 'CARD' = 'DECK',
+): HTMLElement {
   const item = document.createElement('div');
   item.className = `hsguru-feature-card custom-translation-item ${type === 'CARD' ? 'card-item' : 'deck-item'}`;
 
@@ -582,7 +596,8 @@ export function createConfigModal(): void {
 
   const subtitle = document.createElement('p');
   subtitle.className = 'hsguru-modal-subtitle';
-  subtitle.textContent = '按分类管理美化、翻译和增强功能，并在右侧维护自定义词库，让站点界面更接近中文使用习惯。';
+  subtitle.textContent =
+    '按分类管理美化、翻译和增强功能，并在右侧维护自定义词库，让站点界面更接近中文使用习惯。';
 
   headerCopy.appendChild(eyebrow);
   headerCopy.appendChild(title);
@@ -851,9 +866,7 @@ function bindConfigModalEvents(): void {
 
     (mergeBtn as HTMLElement).onclick = () => {
       const checked = Array.from(
-        modal.querySelectorAll(
-          `.custom-item-checkbox[data-type="${type}"]:checked`,
-        ),
+        modal.querySelectorAll(`.custom-item-checkbox[data-type="${type}"]:checked`),
       );
       if (checked.length < 2) return;
 
@@ -885,17 +898,20 @@ function bindConfigModalEvents(): void {
 
       const translationInput = document.createElement('input');
       translationInput.type = 'text';
-      translationInput.className = 'hsguru-input edit-translation-input hsguru-edit-translation-input';
+      translationInput.className =
+        'hsguru-input edit-translation-input hsguru-edit-translation-input';
       translationInput.placeholder = '请输入翻译...';
 
       const saveEditBtn = document.createElement('button');
       saveEditBtn.type = 'button';
-      saveEditBtn.className = 'hsguru-btn hsguru-btn-primary hsguru-save-edit-btn hsguru-edit-save-btn';
+      saveEditBtn.className =
+        'hsguru-btn hsguru-btn-primary hsguru-save-edit-btn hsguru-edit-save-btn';
       saveEditBtn.textContent = '保存';
 
       const cancelEditBtn = document.createElement('button');
       cancelEditBtn.type = 'button';
-      cancelEditBtn.className = 'hsguru-btn hsguru-btn-secondary hsguru-cancel-edit-btn hsguru-edit-cancel-btn';
+      cancelEditBtn.className =
+        'hsguru-btn hsguru-btn-secondary hsguru-cancel-edit-btn hsguru-edit-cancel-btn';
       cancelEditBtn.textContent = '取消';
 
       actionsDiv.appendChild(translationInput);
@@ -918,25 +934,19 @@ function bindConfigModalEvents(): void {
             saveCustomCardTranslation(newOriginal, newTranslation);
             const current = getCustomCardTranslations();
             words.forEach((word) => {
-              if (current[word] === '' && word !== newOriginal)
-                deleteCustomCardTranslation(word);
+              if (current[word] === '' && word !== newOriginal) deleteCustomCardTranslation(word);
             });
           } else {
             saveCustomTranslation(newOriginal, newTranslation);
             const current = getCustomTranslations();
             words.forEach((word) => {
-              if (current[word] === '' && word !== newOriginal)
-                deleteCustomTranslation(word);
+              if (current[word] === '' && word !== newOriginal) deleteCustomTranslation(word);
             });
           }
           itemsToHide.forEach((item) => {
             if (item) item.remove();
           });
-          const newItem = createTranslationItemElement(
-            newOriginal,
-            newTranslation,
-            type,
-          );
+          const newItem = createTranslationItemElement(newOriginal, newTranslation, type);
           if (editRow.parentNode) {
             editRow.parentNode.insertBefore(newItem, editRow);
           }
@@ -985,17 +995,20 @@ function bindConfigModalEvents(): void {
 
       const translationInput = document.createElement('input');
       translationInput.type = 'text';
-      translationInput.className = 'hsguru-input edit-translation-input hsguru-edit-translation-input';
+      translationInput.className =
+        'hsguru-input edit-translation-input hsguru-edit-translation-input';
       translationInput.placeholder = '请输入翻译...';
 
       const saveEditBtn = document.createElement('button');
       saveEditBtn.type = 'button';
-      saveEditBtn.className = 'hsguru-btn hsguru-btn-primary hsguru-save-edit-btn hsguru-edit-save-btn';
+      saveEditBtn.className =
+        'hsguru-btn hsguru-btn-primary hsguru-save-edit-btn hsguru-edit-save-btn';
       saveEditBtn.textContent = '保存';
 
       const cancelEditBtn = document.createElement('button');
       cancelEditBtn.type = 'button';
-      cancelEditBtn.className = 'hsguru-btn hsguru-btn-secondary hsguru-cancel-edit-btn hsguru-edit-cancel-btn';
+      cancelEditBtn.className =
+        'hsguru-btn hsguru-btn-secondary hsguru-cancel-edit-btn hsguru-edit-cancel-btn';
       cancelEditBtn.textContent = '取消';
 
       actionsDiv.appendChild(translationInput);
@@ -1019,11 +1032,7 @@ function bindConfigModalEvents(): void {
           } else {
             saveCustomTranslation(newOriginal, newTranslation);
           }
-          const newItem = createTranslationItemElement(
-            newOriginal,
-            newTranslation,
-            type,
-          );
+          const newItem = createTranslationItemElement(newOriginal, newTranslation, type);
           if (editRow.parentNode) {
             editRow.parentNode.insertBefore(newItem, editRow);
           }
@@ -1065,7 +1074,9 @@ function bindConfigModalEvents(): void {
 // ============================================================
 
 function saveCustomTranslationsFromUI(): void {
-  const inputs = document.querySelectorAll('.custom-translation-input') as NodeListOf<HTMLInputElement>;
+  const inputs = document.querySelectorAll(
+    '.custom-translation-input',
+  ) as NodeListOf<HTMLInputElement>;
   const deckTranslations: Record<string, string> = {};
   const cardTranslations2: Record<string, string> = {};
 
@@ -1100,9 +1111,7 @@ export function loadConfigToUI(config: Record<string, boolean>): void {
     const checkbox = document.getElementById(`enable_${key}`) as HTMLInputElement;
     if (checkbox) {
       checkbox.checked =
-        config[`enable_${key}`] !== undefined
-          ? config[`enable_${key}`]
-          : FEATURES[key].enabled;
+        config[`enable_${key}`] !== undefined ? config[`enable_${key}`] : FEATURES[key].enabled;
     }
   });
 }
@@ -1144,7 +1153,7 @@ export function getConfig(): Record<string, boolean> {
 
 export function applyConfig(config: Record<string, boolean>): void {
   Object.keys(FEATURES).forEach((key) => {
-    if (config.hasOwnProperty(`enable_${key}`)) {
+    if (Object.prototype.hasOwnProperty.call(config, `enable_${key}`)) {
       FEATURES[key].enabled = config[`enable_${key}`];
     }
   });

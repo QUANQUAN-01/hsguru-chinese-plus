@@ -15,7 +15,7 @@ HSGuru-Chinese-Plus 是一款 ScriptCat / Tampermonkey 用户脚本，适用于 
 - 卡组与卡牌信息翻译
 - 本地缓存与自定义配置支持
 
-本项目基于原作者 NGA-****深海之鱼**** 的 [hsguru-chinese](https://bbs.nga.cn/read.php?tid=46381451) 版本进行二次开发，在保留原有翻译与美化能力的基础上，扩展了页面覆盖范围、增强了卡组/卡牌翻译管理、优化了表格视觉呈现，并新增了配置面板、自定义词库、缓存队列和多页面美化规则等功能。
+本项目基于原作者 NGA-\***\*深海之鱼\*\*** 的 [hsguru-chinese](https://bbs.nga.cn/read.php?tid=46381451) 版本进行二次开发，在保留原有翻译与美化能力的基础上，扩展了页面覆盖范围、增强了卡组/卡牌翻译管理、优化了表格视觉呈现，并新增了配置面板、自定义词库、缓存队列和多页面美化规则等功能。
 
 ---
 
@@ -61,7 +61,6 @@ HSGuru-Chinese-Plus 是一款 ScriptCat / Tampermonkey 用户脚本，适用于 
 前往 [Releases](../../releases) 页面，下载最新版本的 `hsguru-chinese-plus.js`，在脚本管理器中新建脚本并粘贴内容即可。
 
 ---
-
 
 ### 安装步骤（以 ScriptCat 为例）
 
@@ -215,20 +214,20 @@ git push origin v2.1.0
 
 | 页面路由                        | 翻译 | 美化 |
 | ------------------------------- | ---- | ---- |
-| `/decks`                        | ✅    | ✅    |
-| `/meta`                         | ✅    | ✅    |
-| `/matchups`                     | ✅    | ✅    |
-| `/leaderboard`                  | ✅    | ✅    |
-| `/leaderboard/points`           | ✅    | ✅    |
-| `/leaderboard/player-stats`     | ✅    | ✅    |
-| `/leaderboard/rank-history/*`   | ✅    | ✅    |
-| `/leaderboard/player-history/*` | ✅    | ✅    |
-| `/streamer-decks`               | ✅    | ✅    |
-| `/deck/<id>`                    | ✅    | ✅    |
-| `/card/<id>`                    | ✅    | ✅    |
-| `/card-stats`                   | ✅    | ✅    |
-| `/cards`                        | ✅    | —    |
-| `/esports`                      | ✅    | —    |
+| `/decks`                        | ✅   | ✅   |
+| `/meta`                         | ✅   | ✅   |
+| `/matchups`                     | ✅   | ✅   |
+| `/leaderboard`                  | ✅   | ✅   |
+| `/leaderboard/points`           | ✅   | ✅   |
+| `/leaderboard/player-stats`     | ✅   | ✅   |
+| `/leaderboard/rank-history/*`   | ✅   | ✅   |
+| `/leaderboard/player-history/*` | ✅   | ✅   |
+| `/streamer-decks`               | ✅   | ✅   |
+| `/deck/<id>`                    | ✅   | ✅   |
+| `/card/<id>`                    | ✅   | ✅   |
+| `/card-stats`                   | ✅   | ✅   |
+| `/cards`                        | ✅   | —    |
+| `/esports`                      | ✅   | —    |
 
 ---
 
@@ -313,10 +312,10 @@ git push origin v2.1.0
 
 ### Pull Request
 
-1. Fork 项目  
-2. 创建分支  
-3. 提交修改  
-4. 发起 PR  
+1. Fork 项目
+2. 创建分支
+3. 提交修改
+4. 发起 PR
 
 ---
 
@@ -328,7 +327,7 @@ git push origin v2.1.0
 
 ## 🙏 致谢
 
-- ****深海之鱼**** — 原版脚本作者，为本项目奠定了完整的翻译框架与美化基础（[NGA 帖子](https://bbs.nga.cn/read.php?tid=46381451)）
+- \***\*深海之鱼\*\*** — 原版脚本作者，为本项目奠定了完整的翻译框架与美化基础（[NGA 帖子](https://bbs.nga.cn/read.php?tid=46381451)）
 - [旅法师营地](https://www.iyingdi.com/) — 提供卡牌中文名称查询 API（`api2.iyingdi.com`）
 - [HSGuru](https://www.hsguru.com/) — 优秀的炉石传说数据统计平台
 

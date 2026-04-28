@@ -1,4 +1,12 @@
-import { BASE_URL, DATASET, CLASSES, BUTTON_TITLES, UI_TEXT, CLASS_ACCENT_COLORS, DEFAULT_CLASS_ACCENT } from '../utils/constants';
+import {
+  BASE_URL,
+  DATASET,
+  CLASSES,
+  BUTTON_TITLES,
+  UI_TEXT,
+  CLASS_ACCENT_COLORS,
+  DEFAULT_CLASS_ACCENT,
+} from '../utils/constants';
 import { uiTranslations } from '../utils/translationsMap';
 import {
   translateTableHeaders,
@@ -16,7 +24,10 @@ import { translationCache, cardCache } from '../utils/translationCache';
 import { generateDeckTranslation } from './deckTranslation';
 
 export function handleTable(): void {
-  const tableConfigs: Record<string, { pattern: RegExp; handler: (table: HTMLTableElement) => void }> = {
+  const tableConfigs: Record<
+    string,
+    { pattern: RegExp; handler: (table: HTMLTableElement) => void }
+  > = {
     card: {
       pattern: /^card\/\d+$/,
       handler: (table) => {
@@ -96,17 +107,15 @@ export function handleTable(): void {
           const tooltipSpan = header.querySelector(`span[${DATASET.BALLOON_POS}]`);
           if (tooltipSpan) {
             const text = tooltipSpan.textContent?.trim() || '';
-            const impacts = [
-              'Mulligan Impact',
-              'Drawn Impact',
-              'Not Drawn Impact',
-              'Kept Impact',
-            ];
+            const impacts = ['Mulligan Impact', 'Drawn Impact', 'Not Drawn Impact', 'Kept Impact'];
             for (const impact of impacts) {
               if (text.startsWith(impact)) {
                 const arrow = text.match(/[↑↓]$/)?.[0] || '';
                 tooltipSpan.textContent = `${uiTranslations.get(impact)}${arrow}`;
-                tooltipSpan.setAttribute('aria-label', uiTranslations.get(`${impact} Tooltip`) || '');
+                tooltipSpan.setAttribute(
+                  'aria-label',
+                  uiTranslations.get(`${impact} Tooltip`) || '',
+                );
                 break;
               }
             }
@@ -291,7 +300,10 @@ export function handleTable(): void {
           if (BUTTON_TITLES[cleanText as keyof typeof BUTTON_TITLES]) {
             const btnEl = button as HTMLButtonElement;
             btnEl.title = BUTTON_TITLES[cleanText as keyof typeof BUTTON_TITLES];
-            btnEl.setAttribute('aria-label', BUTTON_TITLES[cleanText as keyof typeof BUTTON_TITLES]);
+            btnEl.setAttribute(
+              'aria-label',
+              BUTTON_TITLES[cleanText as keyof typeof BUTTON_TITLES],
+            );
           }
         });
 
@@ -343,9 +355,10 @@ export function handleTable(): void {
             cell.classList.contains('class-background') ||
             cell.classList.contains(CLASSES.MATCHUPS_WINRATE_CELL) ||
             cell.classList.contains(CLASSES.MATCHUPS_ARCHETYPE_CELL)
-          ) return;
+          )
+            return;
           const text = cell.textContent?.trim() || '';
-          const numeric = Number.parseFloat(text.replace(/[^\d.\-]/g, ''));
+          const numeric = Number.parseFloat(text.replace(/[^\d.-]/g, ''));
           if (Number.isNaN(numeric)) return;
           cell.classList.add(CLASSES.MATCHUPS_HEAT_CELL);
         });
@@ -380,9 +393,7 @@ export function handleTable(): void {
     },
   };
 
-  const currentPath = window.location.href
-    .replace(BASE_URL, '')
-    .split('?')[0];
+  const currentPath = window.location.href.replace(BASE_URL, '').split('?')[0];
 
   for (const [, config] of Object.entries(tableConfigs)) {
     if (currentPath.match(config.pattern)) {

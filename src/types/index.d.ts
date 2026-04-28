@@ -8,13 +8,13 @@ declare global {
 
 export namespace GM {
   interface XHRDetails {
-    method?: "GET" | "POST" | "PUT" | "DELETE" | "HEAD" | "OPTIONS" | "PATCH";
+    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'PATCH';
     url: string;
     headers?: Record<string, string>;
     data?: string | Blob | FormData;
     timeout?: number;
     context?: any;
-    responseType?: "text" | "arraybuffer" | "blob" | "json" | "document" | "stream";
+    responseType?: 'text' | 'arraybuffer' | 'blob' | 'json' | 'document' | 'stream';
     overrideMimeType?: string;
     onload?: (response: XHRResponse) => void;
     onloadstart?: (response: XHRResponse) => void;

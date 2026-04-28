@@ -11,5 +11,19 @@ export { handleDeck, generateDeckTranslation, getFullPrefixRules } from './deckT
 export { handleTable } from './tableHandler';
 export { handleFilterStyle } from './filterStyleHandler';
 export { handleTitle, handleSub } from './titleHandler';
-export { showChineseCardPreview, moveChineseCardPreview, hideChineseCardPreview, renderChineseCardPreview, activeCardPreviewName } from './cardPreview';
-export { createConfigModal, addConfigButton, getConfig, applyConfig, initializeFeatures, loadConfigToUI, showConfigModal } from './configModal';
+export {
+  showChineseCardPreview,
+  moveChineseCardPreview,
+  hideChineseCardPreview,
+  renderChineseCardPreview,
+  activeCardPreviewName,
+} from './cardPreview';
+export {
+  createConfigModal,
+  addConfigButton,
+  getConfig,
+  applyConfig,
+  initializeFeatures,
+  loadConfigToUI,
+  showConfigModal,
+} from './configModal';

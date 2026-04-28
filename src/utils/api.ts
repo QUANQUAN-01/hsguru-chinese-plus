@@ -63,7 +63,10 @@ export function fetchCardTranslation(
 const pendingFetches = new Map<string, Element[]>();
 const requestQueue: string[] = [];
 const pendingRequestSet = new Set<string>();
-const callbackMap = new Map<string, Set<(cardName: string, result: CardTranslationResult, elements: Element[]) => void>>();
+const callbackMap = new Map<
+  string,
+  Set<(cardName: string, result: CardTranslationResult, elements: Element[]) => void>
+>();
 let activeRequests = 0;
 
 export function isCardPending(cardName: string): boolean {
@@ -127,11 +130,7 @@ export function enqueueCardFetch(
   cardName: string,
   maxConcurrent: number = MAX_CONCURRENT_REQUESTS,
   delay: number = REQUEST_DELAY,
-  onUpdateCard?: (
-    cardName: string,
-    result: CardTranslationResult,
-    elements: Element[],
-  ) => void,
+  onUpdateCard?: (cardName: string, result: CardTranslationResult, elements: Element[]) => void,
 ): void {
   const alreadyPending = pendingRequestSet.has(cardName);
   if (!alreadyPending) {

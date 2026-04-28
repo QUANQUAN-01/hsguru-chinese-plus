@@ -42,7 +42,7 @@ export function getEffectiveCustomTranslations(): Record<string, string> {
 
 export function deleteCustomTranslation(original: string): void {
   loadCustomTranslations();
-  if (customTranslations!.hasOwnProperty(original)) {
+  if (Object.prototype.hasOwnProperty.call(customTranslations, original)) {
     delete customTranslations![original];
     StorageManager.gm.set(CUSTOM_TRANSLATIONS_KEY, customTranslations);
   }
@@ -53,7 +53,7 @@ export function addUnmatchedWord(word: string): void {
   if (
     /[a-zA-Z]/.test(word) &&
     !/[^\x00-\xff]/.test(word) &&
-    !customTranslations!.hasOwnProperty(word)
+    !Object.prototype.hasOwnProperty.call(customTranslations, word)
   ) {
     customTranslations![word] = '';
     StorageManager.gm.set(CUSTOM_TRANSLATIONS_KEY, customTranslations);
@@ -112,9 +112,7 @@ export function generateDeckTranslation(englishName: string): string {
     result[words.length - 1] = classSuffix['DH'];
     processedIndices.add(words.length - 2);
     processedIndices.add(words.length - 1);
-  } else if (
-    /Death\s+(Knight|knight)/.test(`${secondLastWord} ${lastWord}`)
-  ) {
+  } else if (/Death\s+(Knight|knight)/.test(`${secondLastWord} ${lastWord}`)) {
     classFound = 'DK';
     result[words.length - 2] = '';
     result[words.length - 1] = classSuffix['DK'];
@@ -127,9 +125,7 @@ export function generateDeckTranslation(englishName: string): string {
   }
 
   const prefixRules = getFullPrefixRules();
-  const multiByteKeys = Object.keys(prefixRules).filter((key) =>
-    key.includes(' '),
-  );
+  const multiByteKeys = Object.keys(prefixRules).filter((key) => key.includes(' '));
 
   for (const key of multiByteKeys) {
     const keyWords = key.split(' ');
@@ -138,8 +134,7 @@ export function generateDeckTranslation(englishName: string): string {
         !processedIndices.has(index) &&
         keyWords.every(
           (keyWord, keyIndex) =>
-            !processedIndices.has(index + keyIndex) &&
-            words[index + keyIndex] === keyWord,
+            !processedIndices.has(index + keyIndex) && words[index + keyIndex] === keyWord,
         ),
     );
     if (matchStart !== -1) {
@@ -194,10 +189,7 @@ export function handleDeck(): void {
   const deckTitles = queryCache.getOrCreate(deckTitleSelector);
   deckTitles.forEach((element) => {
     const text = element.textContent?.trim() || '';
-    const translation = translationCache.getOrCreate(
-      text,
-      generateDeckTranslation,
-    );
+    const translation = translationCache.getOrCreate(text, generateDeckTranslation);
     if (translation !== text) {
       const fragment = document.createDocumentFragment();
       const tempDiv = document.createElement('div');
@@ -212,9 +204,9 @@ export function handleDeck(): void {
 
   const deckCards = new Set([
     ...Array.from(document.querySelectorAll('#deck_stats_viewport .card')),
-    ...Array.from(document.querySelectorAll('.card-image .decklist-info'))
+    ...(Array.from(document.querySelectorAll('.card-image .decklist-info'))
       .map((deckInfo) => deckInfo.closest('.card'))
-      .filter(Boolean) as Element[],
+      .filter(Boolean) as Element[]),
   ]);
 
   deckCards.forEach((card) => {
@@ -223,9 +215,7 @@ export function handleDeck(): void {
     }
 
     card
-      .querySelectorAll(
-        '.card-image .decklist-info:not(.dust-bar), .decklist-info:not(.dust-bar)',
-      )
+      .querySelectorAll('.card-image .decklist-info:not(.dust-bar), .decklist-info:not(.dust-bar)')
       .forEach((deckInfo) => {
         if (!deckInfo.querySelector('.deck-title')) return;
         deckInfo.classList.add(CLASSES.DECK_SUMMARY);
@@ -235,23 +225,17 @@ export function handleDeck(): void {
         if (title) {
           title.classList.add(CLASSES.DECK_SUMMARY_TITLE);
           title
-            .querySelectorAll(
-              'span[style*="display: block"], span[style*="line-size"]',
-            )
+            .querySelectorAll('span[style*="display: block"], span[style*="line-size"]')
             .forEach((span) => {
               span.classList.add(CLASSES.HIDDEN_DECK_CODE);
             });
-          title
-            .querySelectorAll('span[style*="font-size: 0"]')
-            .forEach((span) => {
-              span.classList.add(CLASSES.HIDDEN_DECK_CODE);
-            });
+          title.querySelectorAll('span[style*="font-size: 0"]').forEach((span) => {
+            span.classList.add(CLASSES.HIDDEN_DECK_CODE);
+          });
         }
         const copyButton = deckInfo.querySelector('.clip-btn-value');
         if (copyButton) copyButton.classList.add(CLASSES.DECK_ICON_BUTTON);
-        const viewButton = deckInfo.querySelector(
-          '.level-right .is-clickable',
-        );
+        const viewButton = deckInfo.querySelector('.level-right .is-clickable');
         if (viewButton) viewButton.classList.add(CLASSES.DECK_ICON_BUTTON);
       });
 

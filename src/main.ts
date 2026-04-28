@@ -1,7 +1,4 @@
-import {
-  migrateLegacyData,
-  migrateLegacyCardCache,
-} from './utils/storage';
+import { migrateLegacyData, migrateLegacyCardCache } from './utils/storage';
 import { queryCache } from './utils/dom';
 import { injectStyles } from './features/styles';
 import { FEATURES } from './utils/constants';
@@ -145,7 +142,8 @@ function setupEventListeners(): void {
     if (!cardNameElement) return;
     const originalName =
       (cardNameElement as HTMLElement).dataset.originalCardName ||
-      cardNameElement.textContent?.trim() || '';
+      cardNameElement.textContent?.trim() ||
+      '';
     showChineseCardPreview(originalName, event.clientX, event.clientY);
   });
 
@@ -163,13 +161,8 @@ function setupEventListeners(): void {
   // Card hover preview - mouseout
   document.body.addEventListener('mouseout', (event) => {
     const cardRow = (event.target as HTMLElement).closest('.tw-relative');
-    if (
-      !cardRow ||
-      !(cardRow as Element).querySelector(SELECTORS.CARD_NAME)
-    )
-      return;
-    const nextCardRow = (event.relatedTarget as HTMLElement | null)
-      ?.closest?.('.tw-relative');
+    if (!cardRow || !(cardRow as Element).querySelector(SELECTORS.CARD_NAME)) return;
+    const nextCardRow = (event.relatedTarget as HTMLElement | null)?.closest?.('.tw-relative');
     if (nextCardRow === cardRow) return;
     hideChineseCardPreview();
   });
@@ -200,8 +193,8 @@ function schedulePluginInitialization() {
   const runWhenStable = () => {
     runHsguruFeaturesSafely();
   };
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", runWhenStable, { once: true });
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runWhenStable, { once: true });
   } else {
     // 如果 DOM 已可用，立即执行（但仍用 microtask 或 requestAnimationFrame 避免阻塞）
     requestAnimationFrame(runWhenStable);

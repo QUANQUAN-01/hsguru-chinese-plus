@@ -6,13 +6,27 @@ import type { CustomTranslations, Config } from '../types';
 // ============================================================
 
 export const storageKey = {
-  config() { return STORAGE_PREFIX.CONFIG; },
-  customDeck() { return STORAGE_PREFIX.CUSTOM_DECK; },
-  customCard() { return STORAGE_PREFIX.CUSTOM_CARD; },
-  cardTranslation(cardName: string) { return `${STORAGE_PREFIX.CARD_TRANSLATION}${cardName}`; },
-  cardImage(cardName: string) { return `${STORAGE_PREFIX.CARD_IMAGE}${cardName}`; },
-  cacheMigrated() { return STORAGE_PREFIX.CACHE_MIGRATED; },
-  dataMigrated() { return STORAGE_PREFIX.DATA_MIGRATED; },
+  config() {
+    return STORAGE_PREFIX.CONFIG;
+  },
+  customDeck() {
+    return STORAGE_PREFIX.CUSTOM_DECK;
+  },
+  customCard() {
+    return STORAGE_PREFIX.CUSTOM_CARD;
+  },
+  cardTranslation(cardName: string) {
+    return `${STORAGE_PREFIX.CARD_TRANSLATION}${cardName}`;
+  },
+  cardImage(cardName: string) {
+    return `${STORAGE_PREFIX.CARD_IMAGE}${cardName}`;
+  },
+  cacheMigrated() {
+    return STORAGE_PREFIX.CACHE_MIGRATED;
+  },
+  dataMigrated() {
+    return STORAGE_PREFIX.DATA_MIGRATED;
+  },
 };
 
 // ============================================================
@@ -89,7 +103,7 @@ export function migrateLegacyCardCache(): void {
     const key = localStorage.key(i);
     if (!key) continue;
     if (key.startsWith('hsguru_')) continue;
-    if (/^[a-zA-Z0-9\s'.,!?&\-]+$/.test(key)) {
+    if (/^[a-zA-Z0-9\s'.,!?&-]+$/.test(key)) {
       const value = localStorage.getItem(key);
       if (value && typeof value === 'string' && value.length > 0) {
         localStorage.setItem(getCardCacheKey(key), value);
@@ -236,7 +250,10 @@ export function deleteCustomCardTranslation(original: string): void {
 
 export function addUnmatchedCardName(name: string): void {
   loadCustomCardTranslations();
-  if (/[a-zA-Z]/.test(name) && !Object.prototype.hasOwnProperty.call(customCardTranslations, name)) {
+  if (
+    /[a-zA-Z]/.test(name) &&
+    !Object.prototype.hasOwnProperty.call(customCardTranslations, name)
+  ) {
     customCardTranslations![name] = '';
     StorageManager.gm.set(CUSTOM_CARD_TRANSLATIONS_KEY, customCardTranslations);
   }

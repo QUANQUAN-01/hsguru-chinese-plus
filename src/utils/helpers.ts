@@ -1,5 +1,10 @@
 import type { TranslationMap } from './translationsMap';
-import { CLASS_ACCENT_COLORS, CLASS_BG_COLORS, DEFAULT_CLASS_ACCENT, DEFAULT_CLASS_BG } from './constants';
+import {
+  CLASS_ACCENT_COLORS,
+  CLASS_BG_COLORS,
+  DEFAULT_CLASS_ACCENT,
+  DEFAULT_CLASS_BG,
+} from './constants';
 
 // ============================================================
 // Time & Text Extraction
@@ -26,17 +31,28 @@ export function translateNodeText(node: Node, translations: TranslationMap): boo
   return false;
 }
 
-export function translateSelectorText(root: ParentNode, selector: string, translations: TranslationMap): void {
+export function translateSelectorText(
+  root: ParentNode,
+  selector: string,
+  translations: TranslationMap,
+): void {
   root.querySelectorAll(selector).forEach((node) => {
     translateNodeText(node, translations);
   });
 }
 
-export function translateTableHeaders(table: HTMLTableElement, selector = 'thead th', translations: TranslationMap): void {
+export function translateTableHeaders(
+  table: HTMLTableElement,
+  selector = 'thead th',
+  translations: TranslationMap,
+): void {
   translateSelectorText(table, selector, translations);
 }
 
-export function translateClassNameCells(table: HTMLTableElement, translations: TranslationMap): void {
+export function translateClassNameCells(
+  table: HTMLTableElement,
+  translations: TranslationMap,
+): void {
   translateSelectorText(table, 'td .tag.player-name .basic-black-text', translations);
 }
 
@@ -50,7 +66,10 @@ export function translateSortedTextNode(node: Element, translations: Translation
   return true;
 }
 
-export function translateTrailingTotalRow(table: HTMLTableElement, translations: TranslationMap): void {
+export function translateTrailingTotalRow(
+  table: HTMLTableElement,
+  translations: TranslationMap,
+): void {
   const totalRow = table.querySelector('tbody tr:last-child td:first-child');
   if (totalRow?.textContent.trim() === 'Total') {
     totalRow.textContent = translations.get('Total') || '总计';
@@ -65,7 +84,10 @@ export function translateRelativeTimeText(text: string, translations: Translatio
   return `| ${number} ${translatedUnit} `;
 }
 
-export function translateLeaderboardPoints(table: HTMLTableElement, translations: TranslationMap): void {
+export function translateLeaderboardPoints(
+  table: HTMLTableElement,
+  translations: TranslationMap,
+): void {
   table.querySelectorAll('tbody td .tag').forEach((tag) => {
     const text = tag.textContent!.trim();
     const ptsMatch = text.match(/^(\d+)\s*pts$/i);
@@ -190,10 +212,7 @@ export function translateTranslatableAttributes(root: Element, translations: Tra
 // Deck Name Translation (wrappers)
 // ============================================================
 
-export function translateDeckNameCell(
-  cell: Element,
-  translateFn: (name: string) => string,
-): void {
+export function translateDeckNameCell(cell: Element, translateFn: (name: string) => string): void {
   const link = cell.querySelector('a');
   if (link) {
     translateDeckNameInNode(link, translateFn);
@@ -217,9 +236,7 @@ export function getMappedClassValue(
   mapping: Record<string, string>,
   fallback: string,
 ): string {
-  const className = Object.keys(mapping).find((name) =>
-    element.classList.contains(name),
-  );
+  const className = Object.keys(mapping).find((name) => element.classList.contains(name));
   return mapping[className!] || fallback;
 }
 
@@ -229,7 +246,11 @@ export function applyClassAccentStyles(element: Element): void {
   const bg = getMappedClassValue(element, CLASS_BG_COLORS, DEFAULT_CLASS_BG);
   htmlEl.style.setProperty('--hsguru-class-accent', accent);
   htmlEl.style.setProperty('--hsguru-class-bg', bg);
-  htmlEl.style.setProperty('background', `linear-gradient(0deg, ${bg}, ${bg}), #f7edcf`, 'important');
+  htmlEl.style.setProperty(
+    'background',
+    `linear-gradient(0deg, ${bg}, ${bg}), #f7edcf`,
+    'important',
+  );
   htmlEl.style.setProperty('border-left', `5px solid ${accent}`, 'important');
 }
 
@@ -255,9 +276,14 @@ export function replaceDeckNameTextNode(
   }
 }
 
-export function extractRelativeTimeText(sourceElement: Element | null, translations: TranslationMap): string {
+export function extractRelativeTimeText(
+  sourceElement: Element | null,
+  translations: TranslationMap,
+): string {
   if (!sourceElement) return '';
-  const timeMatch = sourceElement.textContent!.trim().match(/(\d+)\s*(hours?|minutes?|days?)\s*ago/);
+  const timeMatch = sourceElement
+    .textContent!.trim()
+    .match(/(\d+)\s*(hours?|minutes?|days?)\s*ago/);
   if (!timeMatch) return '';
   const [, number, unit] = timeMatch;
   return `| ${number} ${translations.get(unit + ' ago')} `;
