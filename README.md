@@ -233,17 +233,6 @@ git push origin v2.1.0
 
 ## 🔧 实现细节（Implementation）
 
-### 📄 页面扩展
-
-新增页面翻译与 UI 处理逻辑：
-
-- `/matchups`
-- `/leaderboard/points`
-- `/esports`
-- `/streaming-now`
-- `/hdt-plugin`
-
----
 
 ### 🌐 翻译策略
 
