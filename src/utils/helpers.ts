@@ -152,7 +152,10 @@ export function showClipboardFeedback(
 // ============================================================
 
 export function replaceSubtitle(element: Element, subtitleHTML: string): void {
-  const titleElement = document.querySelector('.title.is-2');
+  const titleElement =
+    document.querySelector('main h1') ||
+    document.querySelector('h1') ||
+    document.querySelector('.title.is-2');
   if (!titleElement) return;
   const newSubtitleElement = document.createElement('div');
   newSubtitleElement.className = 'new_subtitle';

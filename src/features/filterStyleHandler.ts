@@ -49,6 +49,11 @@ const listConfigs = {
   ],
 };
 
+const ALPINE_TRIGGER = '[x-data] a.button';
+const ALPINE_MENU_ITEM = '[x-data] a[class*="tw-w-full"]';
+const LEGACY_TRIGGER = '.has-dropdown > a.button';
+const LEGACY_MENU_ITEM = 'a.dropdown-item';
+
 function applyFilterIcons(root: Element, lists: string[][]): void {
   const textToList = new Map<string, string[]>();
   lists.forEach((list) => {
@@ -56,17 +61,64 @@ function applyFilterIcons(root: Element, lists: string[][]): void {
       textToList.set(text, list);
     });
   });
-  const filterNodes = root.querySelectorAll('.has-dropdown > a.button, a.dropdown-item');
+  const filterNodes = root.querySelectorAll(
+    `${ALPINE_TRIGGER}, ${ALPINE_MENU_ITEM}, ${LEGACY_TRIGGER}, ${LEGACY_MENU_ITEM}`,
+  );
   filterNodes.forEach((node) => {
     const text = node.textContent?.trim() || '';
     if (textToList.has(text)) {
       node.classList.add('class-icon');
-      if (node.matches('.has-dropdown > a.button')) {
+      if (node.matches(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`)) {
         node.classList.add('button-with-icon');
       }
       node.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
     }
   });
+}
+
+function decorateAlpineToolbar(root: ParentNode): void {
+  root.querySelectorAll<HTMLElement>('div[class*="tw-flex-wrap"]').forEach((flex) => {
+    if (!flex.classList.contains('filters-container') && flex.querySelector(ALPINE_TRIGGER)) {
+      flex.classList.add('filters-container');
+      flex.dataset.hsguruFilterContainer = 'true';
+    }
+  });
+}
+
+function collectAlpineToolbars(root: ParentNode): HTMLElement[] {
+  const results: HTMLElement[] = [];
+  root.querySelectorAll<HTMLElement>('div[class*="tw-flex-wrap"]').forEach((flex) => {
+    if (flex.querySelector(ALPINE_TRIGGER) && !flex.classList.contains('filters-container')) {
+      results.push(flex);
+    }
+  });
+  return results;
+}
+
+function createDeckDetailFilterBar(): void {
+  const columns = Array.from(document.querySelectorAll('div.columns.is-multiline .column'));
+  for (const column of columns) {
+    if (!(column instanceof HTMLElement) || !column.querySelector('table')) continue;
+    const container = column.querySelector(':scope > div:not(.subtitle)') as HTMLElement | null;
+    if (!container) continue;
+    const filterSpans = Array.from(container.children).filter(
+      (node) => node.tagName === 'SPAN' && node.querySelector(ALPINE_TRIGGER),
+    );
+    if (filterSpans.length === 0) continue;
+    if (container.querySelector(':scope > .filters-container[data-hsguru-filter-container="true"]')) {
+      continue;
+    }
+    const filterBar = document.createElement('div');
+    filterBar.className = `filters-container ${CLASSES.DECK_DETAIL_FILTERS}`;
+    filterBar.dataset.hsguruFilterContainer = 'true';
+    filterSpans.forEach((span) => {
+      span
+        .querySelectorAll(ALPINE_TRIGGER)
+        .forEach((button) => button.classList.add(CLASSES.DECK_DETAIL_FILTER_BUTTON));
+      filterBar.appendChild(span);
+    });
+    container.insertBefore(filterBar, container.firstChild);
+  }
 }
 
 function createFilterContainer({
@@ -89,6 +141,16 @@ function createFilterContainer({
     (node) => node !== targetElement,
   );
 
+  // 新版 Alpine 工具栏：flex 容器自身即为筛选容器（decorateAlpineToolbar 已标记）
+  const existingToolbar = siblings.find(
+    (node) =>
+      node instanceof HTMLElement &&
+      node.querySelector(ALPINE_TRIGGER) &&
+      (node.classList.contains('filters-container') ||
+        node.querySelector('[class*="tw-flex-wrap"].filters-container')),
+  );
+  if (existingToolbar) return;
+
   const existingContainer = siblings.find(
     (node) =>
       node instanceof HTMLElement &&
@@ -103,11 +165,10 @@ function createFilterContainer({
   container.dataset.hsguruFilterContainer = 'true';
   const controls = siblings.filter((node) => {
     if (!(node instanceof HTMLElement)) return false;
+    if (node.querySelector(ALPINE_TRIGGER)) return true;
     return (
       node.tagName === 'SPAN' ||
-      node.matches(
-        '.has-dropdown.dropdown, a.button, button.button, form, select, input.input, input[type="number"], input[type="search"]',
-      )
+      node.matches('.has-dropdown.dropdown, a.button, button.button, form, select')
     );
   });
   const textToList = new Map<string, string[]>();
@@ -116,16 +177,20 @@ function createFilterContainer({
       textToList.set(text, list);
     });
   });
+  if (controls.length === 0) return;
   controls.forEach((control) => {
-    const button = control.matches('a.button') ? control : control.querySelector('a.button');
-    if (button) {
-      const text = button.textContent?.trim() || '';
-      if (textToList.has(text)) {
-        button.classList.add('class-icon', 'button-with-icon');
-        button.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
-      }
-    }
-    const dropdownItems = Array.from(control.querySelectorAll('a.dropdown-item'));
+    control
+      .querySelectorAll(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`)
+      .forEach((button) => {
+        const text = button.textContent?.trim() || '';
+        if (textToList.has(text)) {
+          button.classList.add('class-icon', 'button-with-icon');
+          button.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
+        }
+      });
+    const dropdownItems = Array.from(
+      control.querySelectorAll(`${ALPINE_MENU_ITEM}, a.dropdown-item`),
+    );
     dropdownItems.forEach((item) => {
       const text = item.textContent?.trim() || '';
       if (textToList.has(text)) {
@@ -151,6 +216,7 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}decks(\\?|$)`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
         targetSelector: '#deck_stats_viewport',
         lists: [listConfigs.format, listConfigs.rank, listConfigs.class],
@@ -160,8 +226,10 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}deck/(\\d+|[A-Za-z0-9+/=%]+)(?:\\?.*)?$`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
+      createDeckDetailFilterBar();
       createFilterContainer({
-        targetSelector: '.table.is-fullwidth.is-striped',
+        targetSelector: 'table',
         lists: [listConfigs.rank],
       });
     },
@@ -169,7 +237,8 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}meta(\\?|$)`),
     handler: () => {
-      const table = document.querySelector('table.table.is-fullwidth.is-striped.is-narrow');
+      decorateAlpineToolbar(document.body);
+      const table = document.querySelector('table');
       if (table) {
         const parentDiv = table.parentNode as Element;
         if (parentDiv) {
@@ -184,8 +253,9 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}matchups(\\?|$)`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
-        targetSelector: '#matchups_table_wrapper',
+        targetSelector: '#matchups_table_wrapper, table',
         lists: [listConfigs.rank],
       });
     },
@@ -193,8 +263,9 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}archetype/[^/]+$`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
-        targetSelector: '.table.is-fullwidth.is-striped',
+        targetSelector: 'table',
         lists: [listConfigs.format, listConfigs.rank],
       });
     },
@@ -202,8 +273,9 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}card-stats\\?archetype=`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
-        targetSelector: '.table.is-fullwidth.is-striped.is-gapless',
+        targetSelector: 'table',
         lists: [listConfigs.format, listConfigs.rank, listConfigs.vsClass],
       });
     },
@@ -211,8 +283,9 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}card-stats\\?deck_id=\\d+`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
-        targetSelector: '.table.is-fullwidth.is-striped',
+        targetSelector: 'table',
         lists: [listConfigs.rank],
       });
     },
@@ -220,8 +293,9 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}card-stats`),
     handler: () => {
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
-        targetSelector: '.table.is-fullwidth.is-striped',
+        targetSelector: 'table',
         lists: [listConfigs.format, listConfigs.rank, listConfigs.class],
       });
     },
@@ -230,26 +304,23 @@ const pageHandlers: Array<{
     urlPattern: new RegExp(`^${BASE_URL}streamer-decks(\\?|$)`),
     handler: () => {
       const toolbar = document.querySelector('.columns.is-pulled-left');
-      if (!toolbar) return;
-      toolbar.classList.add('filters-container', CLASSES.STREAMER_FILTERS);
-      toolbar.classList.remove('is-pulled-left');
-      applyFilterIcons(toolbar, [listConfigs.format, listConfigs.rank, listConfigs.class]);
+      if (toolbar) {
+        toolbar.classList.add('filters-container', CLASSES.STREAMER_FILTERS);
+        toolbar.classList.remove('is-pulled-left');
+      }
+      decorateAlpineToolbar(document.body);
+      applyFilterIcons(document.body, [listConfigs.format, listConfigs.rank, listConfigs.class]);
     },
   },
   {
     urlPattern: new RegExp(`^${BASE_URL}leaderboard(?:[/?].*)?$`),
     handler: () => {
-      const toolbars = new Set<Element>();
-      document.querySelectorAll('.level.level-left').forEach((toolbar) => {
-        if (
-          toolbar.querySelector('.dropdown') &&
-          toolbar.querySelector('a.button, span.button, button.button')
-        ) {
-          toolbars.add(toolbar);
-        }
-      });
+      const toolbars = new Set<Element>(collectAlpineToolbars(document.body));
       document.querySelectorAll(`form[action^='/leaderboard']`).forEach((form) => {
-        if (form.querySelector('.dropdown')) {
+        const wrapper = form.closest('div[class*="tw-flex-wrap"]');
+        if (wrapper) {
+          toolbars.add(wrapper);
+        } else {
           toolbars.add(form);
         }
       });
@@ -260,6 +331,12 @@ const pageHandlers: Array<{
         (toolbar as HTMLElement).dataset.hsguruLeaderboardFiltersStyled = 'true';
         toolbar.classList.add('filters-container', CLASSES.LEADERBOARD_FILTERS);
         if (toolbar.tagName === 'FORM') {
+          const nestedToolbar = toolbar.querySelector('.filters-container');
+          if (nestedToolbar) {
+            toolbar.classList.remove('filters-container', CLASSES.LEADERBOARD_FILTERS);
+            delete (toolbar as HTMLElement).dataset.hsguruLeaderboardFiltersStyled;
+            return;
+          }
           toolbar.querySelectorAll('span.button.is-link, a.button.is-link').forEach((button) => {
             button.classList.add(CLASSES.LEADERBOARD_NAV_BUTTON);
           });
@@ -311,7 +388,7 @@ export function handleFilterStyle(): void {
 
 function createLeaderboardFilterContainer(): void {
   const anchor = document.querySelector(
-    '.svg-container, table.table.is-fullwidth, table.table.is-striped.is-fullwidth.is-narrow',
+    'table[class*="tw-w-full"], .svg-container, table.table.is-fullwidth, table.table.is-striped.is-fullwidth.is-narrow',
   );
 
   if (!anchor || !anchor.parentElement) {

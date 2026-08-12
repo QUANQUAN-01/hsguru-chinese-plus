@@ -52,5 +52,10 @@ export function handleSearch(): void {
       const translation = uiTranslations.get(text);
       if (translation) link.textContent = translation;
     });
+    scope.querySelectorAll('[x-data] a[class*="tw-w-full"]').forEach((link) => {
+      const text = link.textContent?.trim() || '';
+      const translation = uiTranslations.get(text);
+      if (translation) link.textContent = translation;
+    });
   });
 }

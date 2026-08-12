@@ -4,6 +4,7 @@ export function handleAd(): void {
     'below-title-ads',
     'nitropay-below-title-leaderboard',
     'nitropay-floating-video-all',
+    'nitropay-video-all',
     'nitro-float-close',
     'nitropay-sticky-side-rail',
     'nitropay-sticky-side-rail-close',

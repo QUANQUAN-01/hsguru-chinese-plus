@@ -134,18 +134,20 @@ export const filterStyles = `
                 margin: 6px;
                 width: calc(100% - 12px);
             }
-            .filters-container.hsguru-leaderboard-filters > .hsguru-leaderboard-nav-button {
+            .filters-container.hsguru-leaderboard-filters .hsguru-leaderboard-nav-button {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                height: 40px;
-                min-width: 40px;
-                border-radius: 20px;
-                background-color: #c4b18a;
-                border: 1px solid #6d5d40;
-                outline: 3px solid #c5a058;
-                color: #614326;
-                margin-right: 0;
+                width: 40px !important;
+                min-width: 40px !important;
+                height: 40px !important;
+                padding: 0 !important;
+                border: 1px solid #6d5d40 !important;
+                border-radius: 20px !important;
+                outline: 3px solid #c5a058 !important;
+                background-color: #c4b18a !important;
+                color: #614326 !important;
+                margin: 0 !important;
             }
             .filters-container.hsguru-leaderboard-filters > .hsguru-leaderboard-nav-button .icon {
                 margin: 0;
@@ -155,6 +157,12 @@ export const filterStyles = `
                 flex-wrap: wrap;
                 justify-content: flex-start;
                 gap: 12px;
+            }
+            .filters-container.hsguru-leaderboard-filters .filters-container {
+                min-height: 0 !important;
+                padding: 0 !important;
+                background: none !important;
+                box-shadow: none !important;
             }
             form.filters-container.hsguru-leaderboard-filters {
                 margin: 0;
@@ -302,32 +310,39 @@ export const filterStyles = `
             }
             .filters-container > button.button,
             .filters-container > a.button,
-            .filters-container > .hsguru-filter-button {
+            .filters-container > .hsguru-filter-button,
+            main .filters-container [x-data] > a.button {
                 display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                height: 40px;
-                min-width: 100px;
-                padding: 0 18px;
-                border-radius: 20px;
-                background-color: #c4b18a;
-                border: 1px solid #6d5d40;
-                outline: 3px solid #c5a058;
-                color: #614326;
-                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+                height: 40px !important;
+                min-width: 100px !important;
+                padding: 0 18px !important;
+                border: 1px solid #6d5d40 !important;
+                border-radius: 20px !important;
+                outline: 3px solid #c5a058 !important;
+                background-color: #c4b18a !important;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23) !important;
+                color: #614326 !important;
+                font-size: 14px !important;
+                font-weight: 700 !important;
+                line-height: 1 !important;
+                text-decoration: none !important;
             }
             .filters-container > button.button:hover,
             .filters-container > a.button:hover,
-            .filters-container > .hsguru-filter-button:hover {
-                background-color: #ffff95;
-                color: #614326;
+            .filters-container > .hsguru-filter-button:hover,
+            main .filters-container [x-data] > a.button:hover {
+                background-color: #ffff95 !important;
+                color: #614326 !important;
             }
             .filters-container > button.button.is-focused,
             .filters-container > button.button:focus,
             .filters-container > a.button:focus,
-            .filters-container > .hsguru-filter-button:focus {
-                border-color: #6d5d40;
-                box-shadow: 0 0 0 2px rgba(255, 255, 149, 0.28);
+            .filters-container > .hsguru-filter-button:focus,
+            main .filters-container [x-data] > a.button:focus {
+                border-color: #6d5d40 !important;
+                box-shadow: 0 0 0 2px rgba(255, 255, 149, 0.28) !important;
             }
             .filters-container .dropdown .button:hover {
                 background-color: #ffff95
@@ -336,6 +351,49 @@ export const filterStyles = `
                 justify-content: left;
                 min-width: 100px;
                 padding-left: 40px;
+            }
+            .filters-container [x-data] > a.button.button-with-icon,
+            .filters-container [x-data] > a.button.class-icon,
+            .filters-container [x-data] a[class*="tw-w-full"].class-icon {
+                padding-left: 40px !important;
+            }
+            .filters-container.hsguru-deck-detail-filters {
+                position: static !important;
+                padding: 30px !important;
+                margin: 0 !important;
+                align-items: center !important;
+                gap: 10px !important;
+                justify-content: flex-start;
+            }
+            .filters-container.hsguru-deck-detail-filters .hsguru-deck-detail-filter-button,
+            .filters-container.hsguru-deck-detail-filters [x-data] > a.button {
+                height: 34px;
+                min-width: 0;
+                padding: 0 14px;
+                border-radius: 17px;
+                background-color: #c4b18a;
+                border: 1px solid #6d5d40;
+                outline: 3px solid #c5a058;
+                color: #614326;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.16);
+            }
+            .filters-container.hsguru-deck-detail-filters > span {
+                display: inline-flex;
+                min-width: 0;
+            }
+            .filters-container.hsguru-deck-detail-filters [x-data] > a.button {
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                line-height: 1 !important;
+                text-decoration: none !important;
+            }
+            .filters-container.hsguru-deck-detail-filters [x-data] > a.button.button-with-icon {
+                padding-left: 40px !important;
+            }
+            .filters-container.hsguru-deck-detail-filters .hsguru-deck-detail-filter-button:hover,
+            .filters-container.hsguru-deck-detail-filters [x-data] > a.button:hover {
+                background-color: #ffff95;
+                color: #614326;
             }
             @media (max-width: 1280px) {
                 .filters-container {
@@ -555,7 +613,10 @@ export const manaStyles = `
 `;
 
 export const adStyles = `
-.container.is-fluid { padding: 0 !important; }
+            #nitropay-video-all {
+                display: none !important;
+            }
+            .container.is-fluid { padding: 0 !important; }
 /* ... */.container.is-fluid {
                 padding: 0 !important;
             }
@@ -571,7 +632,8 @@ export const adStyles = `
 `;
 
 export const titleStyles = `
-            div.title.is-2 {
+            div.title.is-2,
+            main h1.tw-text-3xl {
                 font-size: 19px !important;
                 color: #614326 !important;
                 white-space: nowrap !important;
@@ -582,6 +644,13 @@ export const titleStyles = `
                 margin: 30px auto !important;
                 position: relative !important;
                 background: url(data:image/webp;base64,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) center center no-repeat;
+            }
+            main h1.tw-text-3xl {
+                width: min(300px, calc(100% - 32px)) !important;
+                max-width: calc(100% - 32px) !important;
+                margin: 30px auto !important;
+                padding: 0 !important;
+                box-sizing: border-box;
             }
 `;
 
@@ -1010,21 +1079,77 @@ export const tableStyles = `
             table.hsguru-meta-table .decklist-info.warrior {
             --hsguru-class-accent: #bf8a55;
             }
-            #deck_stats_viewport .card,
-            .card:has(> .card-image .decklist-info),
+            #class_stats_table {
+            margin: 0 !important;
+            overflow: hidden !important;
+            border: 2px solid #6b5634 !important;
+            border-radius: 8px !important;
+            background: #efe1bc !important;
+            box-shadow: 0 8px 18px rgba(56, 31, 14, 0.16) !important;
+            color: #3a2a18 !important;
+            }
+            #class_stats_table table.tw-w-full {
+            margin: 0 !important;
+            border: 0 !important;
+            border-radius: 0 !important;
+            background: #efe1bc !important;
+            }
+            #class_stats_table thead tr,
+            #class_stats_table thead th {
+            background: #d8c394 !important;
+            color: #3d2b16 !important;
+            }
+            #class_stats_table tbody tr:nth-child(odd) td {
+            background: #fbf8ef !important;
+            }
+            #class_stats_table tbody tr:nth-child(even) td {
+            background: #e2d0a6 !important;
+            }
+            #class_stats_table tbody tr:hover td {
+            background: #f0dfb9 !important;
+            }
+            #class_stats_table tbody td {
+            padding: 7px 12px !important;
+            border-right: 1px solid #caae85 !important;
+            border-bottom: 1px solid #caae85 !important;
+            color: #3a2a18 !important;
+            }
+            #class_stats_table tbody td:last-child,
+            #class_stats_table thead th:last-child {
+            border-right: 0 !important;
+            }
+            #class_stats_table tbody tr:last-child td {
+            border-bottom: 0 !important;
+            font-weight: 700 !important;
+            }
+            #class_stats_table .decklist-info {
+            border-left: 5px solid var(--hsguru-class-accent, #9a8768) !important;
+            font-family: var(--hsguru-font-serif);
+            font-weight: 700 !important;
+            }
+            #class_stats_table .decklist-info.deathknight { --hsguru-class-accent: #c51e35; }
+            #class_stats_table .decklist-info.demonhunter { --hsguru-class-accent: #5aa832; }
+            #class_stats_table .decklist-info.druid { --hsguru-class-accent: #c67a2d; }
+            #class_stats_table .decklist-info.hunter { --hsguru-class-accent: #5a9f44; }
+            #class_stats_table .decklist-info.mage { --hsguru-class-accent: #36b9d4; }
+            #class_stats_table .decklist-info.paladin { --hsguru-class-accent: #d8c936; }
+            #class_stats_table .decklist-info.priest { --hsguru-class-accent: #b8ad98; }
+            #class_stats_table .decklist-info.rogue { --hsguru-class-accent: #d3b63b; }
+            #class_stats_table .decklist-info.shaman { --hsguru-class-accent: #1581cf; }
+            #class_stats_table .decklist-info.warlock { --hsguru-class-accent: #a931c7; }
+            #class_stats_table .decklist-info.warrior { --hsguru-class-accent: #bf8a55; }
             .hsguru-deck-card-shell {
             border: 2px solid #433829 !important;
             border-radius: 10px !important;
             background: #3b3329 !important;
             box-shadow: rgba(38, 28, 17, 0.18) 0 8px 18px !important;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar),
-            .card > .card-image .decklist-info:not(.dust-bar),
             .hsguru-deck-summary {
-            width: var(--decklist-width);
+            width: 100% !important;
             height: 30px !important;
             min-height: 30px !important;
             margin: 0 !important;
+            box-sizing: border-box;
             overflow: hidden;
             border: 1px solid rgba(80, 61, 38, 0.42);
             border-left: 5px solid var(--hsguru-class-accent) !important;
@@ -1032,8 +1157,6 @@ export const tableStyles = `
             background: linear-gradient(90deg, rgba(255, 248, 225, 0.98), rgba(237, 224, 193, 0.94)) !important;
             color: #1f1409;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .level.is-mobile,
-            .card > .card-image .decklist-info:not(.dust-bar) .level.is-mobile,
             .hsguru-deck-summary-row {
             display: grid !important;
             grid-template-columns: 22px minmax(0, 1fr) 22px;
@@ -1044,10 +1167,6 @@ export const tableStyles = `
             margin: 0 !important;
             padding: 2px 6px !important;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .level-left,
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .level-right,
-            .card > .card-image .decklist-info:not(.dust-bar) .level-left,
-            .card > .card-image .decklist-info:not(.dust-bar) .level-right,
             .hsguru-deck-summary-row > div {
             min-width: 0;
             height: 22px !important;
@@ -1056,14 +1175,10 @@ export const tableStyles = `
             align-items: center !important;
             justify-content: center !important;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .level-left,
-            .card > .card-image .decklist-info:not(.dust-bar) .level-left,
             .hsguru-deck-summary-row .level-left {
             width: 100% !important;
             justify-content: flex-start !important;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .deck-title,
-            .card > .card-image .decklist-info:not(.dust-bar) .deck-title,
             .hsguru-deck-summary-title {
             display: flex !important;
             align-items: center !important;
@@ -1074,8 +1189,6 @@ export const tableStyles = `
             overflow: hidden;
             text-align: left;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .deck-title a,
-            .card > .card-image .decklist-info:not(.dust-bar) .deck-title a,
             .hsguru-deck-summary-title a {
             display: block !important;
             overflow: hidden;
@@ -1101,10 +1214,6 @@ export const tableStyles = `
             height: 0 !important;
             line-height: 0 !important;
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .clip-btn-value,
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .level-right .is-clickable,
-            .card > .card-image .decklist-info:not(.dust-bar) .clip-btn-value,
-            .card > .card-image .decklist-info:not(.dust-bar) .level-right .is-clickable,
             .hsguru-deck-icon-button {
             display: inline-flex !important;
             align-items: center !important;
@@ -1116,29 +1225,23 @@ export const tableStyles = `
             background: transparent;
             color: rgba(48, 34, 20, 0.88);
             }
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) .icon.is-small,
-            #deck_stats_viewport .card .decklist-info:not(.dust-bar) svg.icon,
-            .card > .card-image .decklist-info:not(.dust-bar) .icon.is-small,
-            .card > .card-image .decklist-info:not(.dust-bar) svg.icon,
             .hsguru-deck-icon-button .icon.is-small,
             .hsguru-deck-icon-button svg {
             width: 16px;
             height: 16px;
             }
-            #deck_stats_viewport .card .dust-bar.decklist-info,
-            .card > .card-image .dust-bar.decklist-info,
             .hsguru-deck-dust-bar {
-            width: var(--decklist-width);
+            width: 100% !important;
             min-height: 24px;
             margin: 4px 0 0;
+            box-sizing: border-box;
             border: 1px solid rgba(80, 61, 38, 0.34);
             border-left: 5px solid var(--hsguru-class-accent) !important;
             border-radius: 0 0 6px 6px;
             background: linear-gradient(90deg, rgba(255, 248, 225, 0.98), rgba(237, 224, 193, 0.94)) !important;
             color: #1f1409;
             }
-            #deck_stats_viewport .card .dust-bar-inner,
-            .card > .card-image .dust-bar-inner {
+            .hsguru-deck-dust-bar .dust-bar-inner {
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -1149,13 +1252,11 @@ export const tableStyles = `
             font-weight: 700;
             line-height: 22px;
             }
-            #deck_stats_viewport .card .dust-bar .icon,
-            .card > .card-image .dust-bar .icon {
+            .hsguru-deck-dust-bar .icon {
             width: 16px;
             height: 16px;
             }
-            #deck_stats_viewport .card .dust-bar img,
-            .card > .card-image .dust-bar img {
+            .hsguru-deck-dust-bar img {
             width: 16px;
             height: 16px;
             object-fit: contain;
@@ -1491,6 +1592,50 @@ export const tableStyles = `
             outline: none;
             border-color: #8d7658;
             box-shadow: 0 0 0 2px rgba(141, 118, 88, 0.14);
+            }
+            table[class*="tw-w-full"] {
+            background-color: #fbf8ef !important;
+            color: #141413 !important;
+            border: 1px solid #caae85 !important;
+            border-collapse: collapse !important;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100% !important;
+            }
+            table[class*="tw-w-full"] thead th {
+            background-color: #d8c394 !important;
+            color: #3d2b16 !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            border-bottom: 2px solid #9e7d55 !important;
+            border-right: 1px solid #b9aa8b !important;
+            padding: 8px 10px !important;
+            line-height: 1.4 !important;
+            white-space: nowrap !important;
+            vertical-align: middle !important;
+            }
+            table[class*="tw-w-full"] thead th:last-child {
+            border-right: 0;
+            }
+            table[class*="tw-w-full"] tbody td {
+            border-right: 1px solid #caae85 !important;
+            border-bottom: 1px solid #caae85 !important;
+            padding: 8px 10px !important;
+            color: #3a2a18 !important;
+            vertical-align: middle !important;
+            background-color: #fbf8ef !important;
+            }
+            table[class*="tw-w-full"] tbody tr:nth-child(even) {
+            background-color: #e2d0a6 !important;
+            }
+            table[class*="tw-w-full"] tbody tr:nth-child(odd) {
+            background-color: #fbf8ef !important;
+            }
+            table[class*="tw-w-full"] tbody tr:hover {
+            background-color: #f0dfb9 !important;
+            }
+            table[class*="tw-w-full"] tbody tr:last-child td {
+            border-bottom: 0;
             }
 `;
 

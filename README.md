@@ -1,6 +1,6 @@
 # HSGuru-Chinese-Plus
 
-> 当前版本：v2.1.0
+> 当前版本：v2.2.0
 
 ---
 
@@ -135,8 +135,8 @@ src/
 
 ```bash
 # 更新 vite.config.ts 中的 version 后
-git tag v2.1.0
-git push origin v2.1.0
+git tag v2.2.0
+git push origin v2.2.0
 ```
 
 ---

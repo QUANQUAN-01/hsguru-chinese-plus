@@ -122,8 +122,12 @@ function setupEventListeners(): void {
   // Dropdown click handler
   document.body.addEventListener('click', (event) => {
     if (
-      (event.target as HTMLElement).matches('a.dropdown-item') ||
-      (event.target as HTMLElement).closest('a.dropdown-item')
+      (event.target as HTMLElement).matches(
+        'a.dropdown-item, [x-data] a[class*="tw-w-full"]',
+      ) ||
+      (event.target as HTMLElement).closest(
+        'a.dropdown-item, [x-data] a[class*="tw-w-full"]',
+      )
     ) {
       setTimeout(() => {
         queryCache.clear();

@@ -8,7 +8,7 @@ export default defineConfig({
       userscript: {
         name: 'HSGuru-Chinese-Plus',
         namespace: 'https://www.hsguru.com/',
-        version: '2.1.0',
+        version: '2.2.0',
         description: '将HSGuru网站的部分英文替换为中文，并提供界面美化及功能优化。',
         author: 'QuanQuan',
         match: ['https://www.hsguru.com/*'],

@@ -2,7 +2,7 @@ import { queryCache } from '../utils/dom';
 import { uiTranslations } from '../utils/translationsMap';
 
 export function handleFilter(): void {
-  const selectors = ['a.dropdown-item', '.has-dropdown > a.button'];
+  const selectors = ['a.dropdown-item', '[x-data] a[class*="tw-w-full"]'];
   selectors.forEach((selector) => {
     const elements = queryCache.getOrCreate(selector);
     elements.forEach((element) => {

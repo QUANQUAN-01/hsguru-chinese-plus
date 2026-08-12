@@ -6,7 +6,8 @@ import { replaceSubtitle, extractRelativeTimeText, extractGamesText } from '../u
 const cardTranslations = new Map<string, string>();
 
 export function handleTitle(): void {
-  const titleElement = document.querySelector('div.title.is-2');
+  const titleElement =
+    document.querySelector('main h1') || document.querySelector('h1') || document.querySelector('div.title.is-2');
   if (!titleElement) return;
 
   const currentPath = window.location.href.replace(BASE_URL, '').split('?')[0];
@@ -78,7 +79,9 @@ export function handleTitle(): void {
 }
 
 export function handleSub(): void {
-  const subtitleElement = document.querySelector('div.subtitle.is-6, div.subtitle.is-5');
+  const subtitleElement =
+    document.querySelector('div.tw-mb-6 > div.tw-flex.tw-flex-wrap.tw-items-center') ||
+    document.querySelector('div.subtitle.is-6, div.subtitle.is-5');
   if (!subtitleElement) return;
 
   const currentUrl = window.location.href;
@@ -118,7 +121,7 @@ export function handleSub(): void {
     deck: {
       pattern: new RegExp(`^${BASE_URL}deck/(\\d+|[A-Za-z0-9+/=%]+)(?:\\?.*)?$`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span[phx-update="ignore"]');
+        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const editLink = element.querySelector(
           `a[href*="${ROUTES.DECK_BUILDER}"]`,
@@ -149,7 +152,7 @@ export function handleSub(): void {
     cardStatsDeck: {
       pattern: new RegExp(`^${BASE_URL}card-stats\\?deck_id=\\d+`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span[phx-update="ignore"]');
+        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
         const deckDetailLink = element.querySelector(
@@ -171,7 +174,7 @@ export function handleSub(): void {
     cardStatsArchetype: {
       pattern: new RegExp(`^${BASE_URL}card-stats\\?archetype=`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span[phx-update="ignore"]');
+        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
         const cardStatsQueryLink = element.querySelector(
@@ -193,7 +196,7 @@ export function handleSub(): void {
     archetype: {
       pattern: new RegExp(`^${BASE_URL}archetype/[^/]+$`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span[phx-update="ignore"]');
+        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const cardStatsByArchLink = element.querySelector(
           `a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`,
