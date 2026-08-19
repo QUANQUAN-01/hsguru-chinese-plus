@@ -54,6 +54,78 @@ const ALPINE_MENU_ITEM = '[x-data] a[class*="tw-w-full"]';
 const LEGACY_TRIGGER = '.has-dropdown > a.button';
 const LEGACY_MENU_ITEM = 'a.dropdown-item';
 
+function getFilterKey(node: Element): string {
+  const rawKey = node.getAttribute('data-hsguru-filter-key')?.trim();
+  const text = rawKey || node.textContent?.trim() || '';
+  if (isKnownFilterKey(text)) return text;
+  for (const [english, translated] of uiTranslations) {
+    if (translated.trim() === text && isKnownFilterKey(english)) {
+      if (!rawKey) node.setAttribute('data-hsguru-filter-key', english);
+      return english;
+    }
+  }
+  return text;
+}
+
+function filterClassName(key: string): string {
+  return `class-${key.toLowerCase().replace(/\s+/g, '-')}`;
+}
+
+const FILTER_CLASS_NAMES = new Set(
+  [...Object.values(listConfigs).flat(), 'Top 1k', 'Top 5k'].map(filterClassName),
+);
+
+function addClassIfMissing(node: Element, ...classNames: string[]): void {
+  classNames.forEach((className) => {
+    if (!node.classList.contains(className)) node.classList.add(className);
+  });
+}
+
+function resetFilterIcon(node: Element): void {
+  node.classList.remove('class-icon', 'button-with-icon');
+  FILTER_CLASS_NAMES.forEach((className) => node.classList.remove(className));
+}
+
+function isKnownFilterKey(key: string): boolean {
+  return Object.values(listConfigs).some((list) => list.includes(key));
+}
+
+function shouldUseFilterIcon(key: string): boolean {
+  return [listConfigs.format, listConfigs.class, listConfigs.vsClass].some((list) =>
+    list.includes(key),
+  );
+}
+
+function isAlpineFilterGroup(group: Element, depth = 0): boolean {
+  if (depth > 2) return false;
+  if (group.matches('[x-data]')) {
+    const button = group.querySelector(':scope > a.button');
+    return Boolean(button && isKnownFilterKey(getFilterKey(button)));
+  }
+  return Array.from(group.children).some((child) => isAlpineFilterGroup(child, depth + 1));
+}
+
+function isAlpineFilterFlex(flex: HTMLElement): boolean {
+  const groups = Array.from(flex.children);
+  return groups.some((group) => isAlpineFilterGroup(group));
+}
+
+function containsFilterControl(container: Element, lists: string[][]): boolean {
+  const controls = container.querySelectorAll(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`);
+  return lists.every((list) =>
+    Array.from(controls).some((control) => list.includes(getFilterKey(control))),
+  );
+}
+
+function updateNestedFilterMarker(container: HTMLElement): void {
+  const parent = container.parentElement?.closest('.filters-container');
+  if (parent && parent !== container) {
+    container.dataset.hsguruNestedFilterContainer = 'true';
+  } else {
+    delete container.dataset.hsguruNestedFilterContainer;
+  }
+}
+
 function applyFilterIcons(root: Element, lists: string[][]): void {
   const textToList = new Map<string, string[]>();
   lists.forEach((list) => {
@@ -65,30 +137,34 @@ function applyFilterIcons(root: Element, lists: string[][]): void {
     `${ALPINE_TRIGGER}, ${ALPINE_MENU_ITEM}, ${LEGACY_TRIGGER}, ${LEGACY_MENU_ITEM}`,
   );
   filterNodes.forEach((node) => {
-    const text = node.textContent?.trim() || '';
-    if (textToList.has(text)) {
-      node.classList.add('class-icon');
+    const key = getFilterKey(node);
+    if (textToList.has(key)) {
+      resetFilterIcon(node);
+      if (!shouldUseFilterIcon(key)) return;
+      addClassIfMissing(node, 'class-icon');
       if (node.matches(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`)) {
-        node.classList.add('button-with-icon');
+        addClassIfMissing(node, 'button-with-icon');
       }
-      node.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
+      addClassIfMissing(node, filterClassName(key));
     }
   });
 }
 
 function decorateAlpineToolbar(root: ParentNode): void {
   root.querySelectorAll<HTMLElement>('div[class*="tw-flex-wrap"]').forEach((flex) => {
-    if (!flex.classList.contains('filters-container') && flex.querySelector(ALPINE_TRIGGER)) {
-      flex.classList.add('filters-container');
+    if (!isAlpineFilterFlex(flex)) return;
+    if (!flex.classList.contains('filters-container')) flex.classList.add('filters-container');
+    if (flex.dataset.hsguruFilterContainer !== 'true') {
       flex.dataset.hsguruFilterContainer = 'true';
     }
+    updateNestedFilterMarker(flex);
   });
 }
 
 function collectAlpineToolbars(root: ParentNode): HTMLElement[] {
   const results: HTMLElement[] = [];
   root.querySelectorAll<HTMLElement>('div[class*="tw-flex-wrap"]').forEach((flex) => {
-    if (flex.querySelector(ALPINE_TRIGGER) && !flex.classList.contains('filters-container')) {
+    if (isAlpineFilterFlex(flex) && !flex.classList.contains('filters-container')) {
       results.push(flex);
     }
   });
@@ -105,7 +181,14 @@ function createDeckDetailFilterBar(): void {
       (node) => node.tagName === 'SPAN' && node.querySelector(ALPINE_TRIGGER),
     );
     if (filterSpans.length === 0) continue;
-    if (container.querySelector(':scope > .filters-container[data-hsguru-filter-container="true"]')) {
+    const existingFilterBar = container.querySelector(
+      ':scope > .filters-container.hsguru-deck-detail-filters',
+    );
+    if (existingFilterBar) {
+      const detailBar = existingFilterBar as HTMLElement;
+      detailBar.classList.add(CLASSES.DECK_DETAIL_FILTERS);
+      detailBar.dataset.hsguruFilterContainer = 'true';
+      updateNestedFilterMarker(detailBar);
       continue;
     }
     const filterBar = document.createElement('div');
@@ -118,6 +201,7 @@ function createDeckDetailFilterBar(): void {
       filterBar.appendChild(span);
     });
     container.insertBefore(filterBar, container.firstChild);
+    updateNestedFilterMarker(filterBar);
   }
 }
 
@@ -141,24 +225,17 @@ function createFilterContainer({
     (node) => node !== targetElement,
   );
 
-  // 新版 Alpine 工具栏：flex 容器自身即为筛选容器（decorateAlpineToolbar 已标记）
-  const existingToolbar = siblings.find(
-    (node) =>
-      node instanceof HTMLElement &&
-      node.querySelector(ALPINE_TRIGGER) &&
-      (node.classList.contains('filters-container') ||
-        node.querySelector('[class*="tw-flex-wrap"].filters-container')),
-  );
-  if (existingToolbar) return;
-
   const existingContainer = siblings.find(
     (node) =>
       node instanceof HTMLElement &&
       node.classList.contains('filters-container') &&
-      node.dataset.hsguruFilterContainer === 'true',
+      containsFilterControl(node, lists),
   );
 
-  if (existingContainer) return;
+  if (existingContainer) {
+    (existingContainer as HTMLElement).dataset.hsguruFilterContainer = 'true';
+    return;
+  }
 
   const container = document.createElement('div');
   container.className = 'filters-container';
@@ -179,30 +256,30 @@ function createFilterContainer({
   });
   if (controls.length === 0) return;
   controls.forEach((control) => {
-    control
-      .querySelectorAll(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`)
-      .forEach((button) => {
-        const text = button.textContent?.trim() || '';
-        if (textToList.has(text)) {
-          button.classList.add('class-icon', 'button-with-icon');
-          button.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
-        }
-      });
+    control.querySelectorAll(`${ALPINE_TRIGGER}, ${LEGACY_TRIGGER}`).forEach((button) => {
+      const key = getFilterKey(button);
+      if (textToList.has(key)) {
+        resetFilterIcon(button);
+        if (!shouldUseFilterIcon(key)) return;
+        addClassIfMissing(button, 'class-icon', 'button-with-icon', filterClassName(key));
+      }
+    });
     const dropdownItems = Array.from(
       control.querySelectorAll(`${ALPINE_MENU_ITEM}, a.dropdown-item`),
     );
     dropdownItems.forEach((item) => {
-      const text = item.textContent?.trim() || '';
-      if (textToList.has(text)) {
-        item.classList.add('class-icon');
-        item.classList.add(`class-${text.toLowerCase().replace(/\s+/g, '-')}`);
+      const key = getFilterKey(item);
+      if (textToList.has(key)) {
+        resetFilterIcon(item);
+        if (!shouldUseFilterIcon(key)) return;
+        addClassIfMissing(item, 'class-icon', filterClassName(key));
       }
     });
     control.querySelectorAll('a.button, button.button, a.dropdown-item').forEach((button) => {
-      button.classList.add('hsguru-filter-button');
+      addClassIfMissing(button, 'hsguru-filter-button');
     });
     if (control.matches('button.button')) {
-      control.classList.add('hsguru-filter-button');
+      addClassIfMissing(control, 'hsguru-filter-button');
     }
   });
   controls.forEach((control) => container.appendChild(control));
@@ -228,6 +305,7 @@ const pageHandlers: Array<{
     handler: () => {
       decorateAlpineToolbar(document.body);
       createDeckDetailFilterBar();
+      decorateAlpineToolbar(document.body);
       createFilterContainer({
         targetSelector: 'table',
         lists: [listConfigs.rank],

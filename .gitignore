@@ -11,6 +11,16 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.*
+!.env.example
+
+# Test and build caches
+coverage/
+.nyc_output/
+.cache/
+.vite/
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
@@ -28,7 +38,12 @@ html/
 docs/
 script_resource/
 AGent.md
-fix/
+!fix/
+fix/*
+!fix/docs/
+fix/docs/*
+!fix/docs/filter-bar-issues/
+!fix/docs/filter-bar-issues/*.md
 AGENTS.md
 SKILL.md
 skills-lock.json

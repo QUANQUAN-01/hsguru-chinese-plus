@@ -52,21 +52,36 @@ FEATURES.SCROLL_TOP.handler = handleScrollTop;
 
 let hsguruIsApplying = false;
 let hsguruDomObserver: MutationObserver | null = null;
+let dropdownRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+let dropdownFallbackPending = false;
 
-function runHsguruFeaturesSafely(): void {
+const FILTER_MUTATION_KEYS = new Set(['FILTER', 'FILTER_STYLE', 'SEARCH']);
+const CARD_MUTATION_KEYS = new Set(['CARD', 'CARD_LINK', 'TABLE']);
+const DECK_MUTATION_KEYS = new Set(['DECK', 'TAG']);
+const TABLE_MUTATION_KEYS = new Set(['TABLE']);
+const FILTER_SELECTOR =
+  '.filters-container, .has-dropdown, a.dropdown-item, [x-data] a.button, [x-data] a[class*="tw-w-full"], input[placeholder="Search"]';
+const CARD_SELECTOR = `${SELECTORS.CARD_NAME}, .card-image, .decklist-card-background`;
+const DECK_SELECTOR = `${SELECTORS.DECK_TITLE}, ${SELECTORS.DECK_LINK}, ${SELECTORS.BASIC_DECK_TITLE}, .decklist-info, #deck_stats_viewport`;
+const CONTENT_SELECTOR = 'table';
+
+type FeatureKeys = ReadonlySet<string> | undefined;
+
+function runHsguruFeaturesSafely(featureKeys?: FeatureKeys): void {
   if (hsguruIsApplying) return;
 
   hsguruIsApplying = true;
   try {
     queryCache.clear();
-    initializeFeatures();
+    initializeFeatures(featureKeys);
   } finally {
     hsguruIsApplying = false;
   }
 }
 
-function initializeFeatures(): void {
-  Object.values(FEATURES).forEach((feature) => {
+function initializeFeatures(featureKeys?: FeatureKeys): void {
+  Object.entries(FEATURES).forEach(([key, feature]) => {
+    if (featureKeys && !featureKeys.has(key)) return;
     if (feature.enabled && feature.handler) {
       try {
         feature.handler();
@@ -81,25 +96,109 @@ function initializeFeatures(): void {
 // DOM Translation Observer
 // ============================================================
 
+function mutationElement(mutation: MutationRecord): Element | null {
+  if (mutation.target instanceof Element) return mutation.target;
+  return mutation.target.parentElement;
+}
+
+function subtreeMatches(node: Node, selector: string): boolean {
+  return (
+    node instanceof Element && (node.matches(selector) || node.querySelector(selector) !== null)
+  );
+}
+
+function mutationMatches(mutation: MutationRecord, selector: string): boolean {
+  const target = mutationElement(mutation);
+  if (target?.closest(selector)) return true;
+  return Array.from(mutation.addedNodes).some((node) => subtreeMatches(node, selector));
+}
+
+function isPluginMutation(mutation: MutationRecord): boolean {
+  const target = mutationElement(mutation);
+  return Boolean(
+    target?.closest(
+      '#hsguru-config-modal, #config-menu-button, .hsguru-chinese-card-preview, [data-hsguru-plugin-ui]',
+    ),
+  );
+}
+
+function classifyMutation(mutation: MutationRecord): FeatureKeys {
+  if (isPluginMutation(mutation)) return new Set();
+
+  const keys = new Set<string>();
+
+  if (mutationMatches(mutation, FILTER_SELECTOR)) {
+    FILTER_MUTATION_KEYS.forEach((key) => keys.add(key));
+  }
+  if (mutationMatches(mutation, CARD_SELECTOR)) {
+    CARD_MUTATION_KEYS.forEach((key) => keys.add(key));
+  }
+  if (mutationMatches(mutation, DECK_SELECTOR)) {
+    DECK_MUTATION_KEYS.forEach((key) => keys.add(key));
+  }
+  if (mutationMatches(mutation, CONTENT_SELECTOR)) {
+    TABLE_MUTATION_KEYS.forEach((key) => keys.add(key));
+  }
+
+  // An unrecognised LiveView/Alpine update may replace any page region. Keep
+  // the full pass for those updates so site-owned state is never discarded.
+  return keys.size > 0 ? keys : undefined;
+}
+
+function isEffectiveDropdownMutation(mutation: MutationRecord): boolean {
+  if (mutationMatches(mutation, CARD_SELECTOR) || mutationMatches(mutation, DECK_SELECTOR)) {
+    return true;
+  }
+
+  // Filter controls can be inserted into a table by the script itself. That
+  // structural change must not suppress the fallback for the site's update.
+  return mutationMatches(mutation, CONTENT_SELECTOR) && !mutationMatches(mutation, FILTER_SELECTOR);
+}
+
 function setupDOMTranslationObserver(): void {
   if (hsguruDomObserver) return;
 
   let rafId: number | null = null;
+  let pendingFeatureKeys: Set<string> | undefined;
+  let pendingFullUpdate = false;
 
-  const scheduleUpdate = () => {
+  const scheduleUpdate = (featureKeys?: FeatureKeys) => {
+    if (featureKeys) {
+      if (!pendingFullUpdate) {
+        if (!pendingFeatureKeys) pendingFeatureKeys = new Set();
+        featureKeys.forEach((key) => pendingFeatureKeys!.add(key));
+      }
+    } else {
+      pendingFullUpdate = true;
+      pendingFeatureKeys = undefined;
+    }
     if (rafId !== null) return;
     rafId = requestAnimationFrame(() => {
       rafId = null;
-      runHsguruFeaturesSafely();
+      const keys = pendingFullUpdate ? undefined : pendingFeatureKeys;
+      pendingFullUpdate = false;
+      pendingFeatureKeys = undefined;
+      runHsguruFeaturesSafely(keys);
     });
   };
 
   hsguruDomObserver = new MutationObserver((mutations) => {
     for (const mutation of mutations) {
-      if (mutation.type === 'childList' || mutation.type === 'characterData') {
+      if (mutation.type !== 'childList' && mutation.type !== 'characterData') continue;
+      const featureKeys = classifyMutation(mutation);
+      if (!featureKeys) {
         scheduleUpdate();
         break;
       }
+      if (featureKeys.size === 0) continue;
+      if (dropdownFallbackPending && isEffectiveDropdownMutation(mutation)) {
+        dropdownFallbackPending = false;
+        if (dropdownRefreshTimer !== null) {
+          clearTimeout(dropdownRefreshTimer);
+          dropdownRefreshTimer = null;
+        }
+      }
+      scheduleUpdate(featureKeys);
     }
   });
 
@@ -122,17 +221,19 @@ function setupEventListeners(): void {
   // Dropdown click handler
   document.body.addEventListener('click', (event) => {
     if (
-      (event.target as HTMLElement).matches(
-        'a.dropdown-item, [x-data] a[class*="tw-w-full"]',
-      ) ||
-      (event.target as HTMLElement).closest(
-        'a.dropdown-item, [x-data] a[class*="tw-w-full"]',
-      )
+      (event.target as HTMLElement).matches('a.dropdown-item, [x-data] a[class*="tw-w-full"]') ||
+      (event.target as HTMLElement).closest('a.dropdown-item, [x-data] a[class*="tw-w-full"]')
     ) {
-      setTimeout(() => {
+      if (dropdownRefreshTimer !== null) clearTimeout(dropdownRefreshTimer);
+      dropdownFallbackPending = true;
+      dropdownRefreshTimer = setTimeout(() => {
+        dropdownRefreshTimer = null;
+        dropdownFallbackPending = false;
+        // LiveView normally produces a classified observer update. This is a
+        // delayed fallback for responses that only settle after the click.
+        const keys = new Set(['DECK', 'CARD']);
         queryCache.clear();
-        handleDeck();
-        handleCard();
+        runHsguruFeaturesSafely(keys);
       }, 1000);
     }
   });

@@ -1,5 +1,6 @@
 import { uiTranslations } from '../utils/translationsMap';
 import { translateExactTextNodes, translateTranslatableAttributes } from '../utils/helpers';
+import { translateFilterItem } from './filterTranslation';
 
 export function handleSearch(): void {
   const searchBoxes = Array.from(
@@ -46,16 +47,12 @@ export function handleSearch(): void {
       searchInput.closest('[id]') ||
       searchInput.closest('div');
     if (!scope) return;
-    translateExactTextNodes(scope as Element, uiTranslations);
     scope.querySelectorAll('.dropdown .dropdown-item a').forEach((link) => {
-      const text = link.textContent?.trim() || '';
-      const translation = uiTranslations.get(text);
-      if (translation) link.textContent = translation;
+      translateFilterItem(link);
     });
     scope.querySelectorAll('[x-data] a[class*="tw-w-full"]').forEach((link) => {
-      const text = link.textContent?.trim() || '';
-      const translation = uiTranslations.get(text);
-      if (translation) link.textContent = translation;
+      translateFilterItem(link);
     });
+    translateExactTextNodes(scope as Element, uiTranslations);
   });
 }

@@ -1,7 +1,5 @@
 # HSGuru-Chinese-Plus
 
-> 当前版本：v2.2.0
-
 ---
 
 ## 📌 项目简介
