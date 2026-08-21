@@ -102,6 +102,7 @@ export function handleTable(): void {
     'card-stats': {
       pattern: /^card-stats/,
       handler: (table) => {
+        table.classList.add('hsguru-card-stats-table');
         const headers = table.querySelectorAll('thead th a');
         headers.forEach((header) => {
           const tooltipSpan = header.querySelector(`span[${DATASET.BALLOON_POS}]`);
@@ -121,17 +122,21 @@ export function handleTable(): void {
             }
           } else {
             const text = header.textContent?.trim() || '';
-            const counts = [
+            const headerTranslations = [
               'Card',
+              'Mulligan Impact',
+              'Drawn Impact',
+              'Not Drawn Impact',
+              'Kept Impact',
               'Mulligan Count',
               'Drawn Count',
               'Not Drawn Count',
               'Kept Count',
             ];
-            for (const count of counts) {
-              if (text.startsWith(count)) {
+            for (const headerKey of headerTranslations) {
+              if (text.startsWith(headerKey)) {
                 const arrow = text.match(/[↑↓]$/)?.[0] || '';
-                header.textContent = `${uiTranslations.get(count)}${arrow}`;
+                header.textContent = `${uiTranslations.get(headerKey) || headerKey}${arrow}`;
                 break;
               }
             }

@@ -74,6 +74,34 @@ body {
                 color:#f4d442 !important;
                 font-weight: bold !important;
             }
+            .hsguru-post-patch-notice {
+                margin: 12px 0 16px !important;
+                padding: 12px 16px !important;
+                border: 1px solid rgba(240, 178, 68, 0.55) !important;
+                border-left: 4px solid #f0b244 !important;
+                border-radius: 8px !important;
+                background: linear-gradient(110deg, rgba(74, 52, 28, 0.96), rgba(47, 39, 32, 0.96)) !important;
+                box-shadow: 0 5px 16px rgba(24, 16, 10, 0.22) !important;
+            }
+            .hsguru-post-patch-notice .has-text-warning {
+                color: #ffd166 !important;
+            }
+            .hsguru-post-patch-notice p {
+                margin: 0 !important;
+                color: #f7ead1 !important;
+                font-size: 14px !important;
+                font-weight: 600 !important;
+                line-height: 1.55 !important;
+            }
+            @media (max-width: 600px) {
+                .hsguru-post-patch-notice {
+                    margin: 10px 0 14px !important;
+                    padding: 10px 12px !important;
+                }
+                .hsguru-post-patch-notice p {
+                    font-size: 13px !important;
+                }
+            }
             .footer {
                 background-color: #170e09 !important;
             }
@@ -132,7 +160,8 @@ export const filterStyles = `
                 padding-left: 24px !important;
             }
             .filters-container.hsguru-streamer-filters > .button,
-            .filters-container.hsguru-streamer-filters > a.button {
+            .filters-container.hsguru-streamer-filters > a.button,
+            .filters-container.hsguru-streamer-filters > [x-data] > a.button {
                 height: 40px !important;
                 min-width: 40px !important;
                 border-radius: 20px !important;
@@ -144,6 +173,9 @@ export const filterStyles = `
             }
             .filters-container.hsguru-streamer-filters .dropdown {
                 margin-right: 0;
+            }
+            .filters-container.hsguru-streamer-filters > [x-data] {
+                flex: 0 0 auto;
             }
             .filters-container.hsguru-streamer-filters .input {
                 background: #f4ead1;
@@ -752,11 +784,36 @@ export const tableStyles = `
             .table.is-striped tbody tr:not(.is-selected):nth-child(even) {
             background-color: #dbc99e !important;
         }
-            table.table.is-fullwidth {
-            width:90% !important;
-            margin:0 auto 0 0 !important;
-            }
-            table a {
+             table.table.is-fullwidth {
+             width:90% !important;
+             margin:0 auto 0 0 !important;
+             }
+             table.hsguru-card-stats-table {
+             width: 100% !important;
+             table-layout: fixed !important;
+             }
+             table.hsguru-card-stats-table th:first-child,
+             table.hsguru-card-stats-table td:first-child {
+             width: 240px !important;
+             min-width: 240px !important;
+             max-width: 240px !important;
+             }
+             table.hsguru-card-stats-table td:first-child > div {
+             max-width: 220px !important;
+             min-width: 0 !important;
+             }
+             @media (max-width: 700px) {
+             table.hsguru-card-stats-table th:first-child,
+             table.hsguru-card-stats-table td:first-child {
+             width: 190px !important;
+             min-width: 190px !important;
+             max-width: 190px !important;
+             }
+             table.hsguru-card-stats-table td:first-child > div {
+             max-width: 175px !important;
+             }
+             }
+             table a {
             color: #614326 !important;
             }
             table a:hover {

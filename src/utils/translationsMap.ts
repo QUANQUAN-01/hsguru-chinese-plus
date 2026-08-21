@@ -275,6 +275,7 @@ export const uiTranslations: TranslationMap = new Map([
   ['Player', '玩家'],
   ['Position', '当前排名'],
   ['Points Season', '积分赛季'],
+  ['Positive/Negative Colors', '正向色彩 / 反向色彩'],
   ['Rank', '排名'],
   ['Ranked Standard', '标准天梯'],
   ['Region', '地区'],
@@ -313,6 +314,7 @@ export const uiTranslations: TranslationMap = new Map([
   ['View Replay', '查看回放'],
   ['Winrate %', '胜率 %'],
   ['Winrate', '胜率'],
+  ['Weighted Colors', '加权颜色'],
   ["Wonderful Un'Goro", '美好的安戈洛'],
   ['History', '历史'],
   ['Battletag', '昵称'],
@@ -471,8 +473,8 @@ export const uiTranslations: TranslationMap = new Map([
     '后续还会继续支持更多内容。如果你有想法，欢迎先查看置顶帖，再加入我的 Discord 进行分享。',
   ],
   [
-    'This data uses old archetyping. Archetyping will be updated after there is more data with the latest patch',
-    '这些数据使用了旧的卡组类型。卡组类型将在有更多最新补丁数据后更新',
+    'Post patch archetyping will be updated a couple days post patch',
+    '补丁发布后，卡组类型将在几天后更新',
   ],
   // 关键词
   ['Battlecry', '战吼'],

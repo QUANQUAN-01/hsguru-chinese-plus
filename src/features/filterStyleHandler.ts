@@ -342,10 +342,7 @@ const pageHandlers: Array<{
     urlPattern: new RegExp(`^${BASE_URL}archetype/[^/]+$`),
     handler: () => {
       decorateAlpineToolbar(document.body);
-      createFilterContainer({
-        targetSelector: 'table',
-        lists: [listConfigs.format, listConfigs.rank],
-      });
+      createDeckDetailFilterBar();
     },
   },
   {
@@ -381,13 +378,39 @@ const pageHandlers: Array<{
   {
     urlPattern: new RegExp(`^${BASE_URL}streamer-decks(\\?|$)`),
     handler: () => {
-      const toolbar = document.querySelector('.columns.is-pulled-left');
+      const toolbar = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          'main div.tw-flex.tw-flex-wrap.tw-items-center.tw-gap-1',
+        ),
+      ).find((element) => element.querySelector(':scope > [x-data]'));
       if (toolbar) {
         toolbar.classList.add('filters-container', CLASSES.STREAMER_FILTERS);
-        toolbar.classList.remove('is-pulled-left');
       }
       decorateAlpineToolbar(document.body);
       applyFilterIcons(document.body, [listConfigs.format, listConfigs.rank, listConfigs.class]);
+    },
+  },
+  {
+    urlPattern: new RegExp(`^${BASE_URL}replays(\\?|$)`),
+    handler: () => {
+      const table = document.querySelector('#replays_table');
+      const toolbarParent = table?.parentElement?.parentElement;
+      const toolbar = toolbarParent
+        ? Array.from(toolbarParent.children).find(
+            (element) => element !== table && element.querySelector('[x-data]'),
+          )
+        : null;
+      if (toolbar instanceof HTMLElement) {
+        toolbar.classList.add('filters-container');
+        toolbar.dataset.hsguruFilterContainer = 'true';
+      }
+      decorateAlpineToolbar(document.body);
+      applyFilterIcons(document.body, [
+        listConfigs.format,
+        listConfigs.rank,
+        listConfigs.class,
+        listConfigs.vsClass,
+      ]);
     },
   },
   {

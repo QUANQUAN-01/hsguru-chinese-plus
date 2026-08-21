@@ -7,7 +7,9 @@ const cardTranslations = new Map<string, string>();
 
 export function handleTitle(): void {
   const titleElement =
-    document.querySelector('main h1') || document.querySelector('h1') || document.querySelector('div.title.is-2');
+    document.querySelector('main h1') ||
+    document.querySelector('h1') ||
+    document.querySelector('div.title.is-2');
   if (!titleElement) return;
 
   const currentPath = window.location.href.replace(BASE_URL, '').split('?')[0];
@@ -59,9 +61,30 @@ export function handleTitle(): void {
     return;
   }
 
+  if (currentPath.match(/^archetype\/[^/]+$/)) {
+    const match = text.match(/^(.*?) (Standard|Wild) stats$/);
+    if (match) {
+      const deckName = generateDeckTranslation(match[1]);
+      const format = match[2] === 'Standard' ? '标准' : '狂野';
+      const translated = `${toPlainText(deckName)} ${format} 卡组类型统计`;
+      titleElement.textContent = translated;
+      document.title = translated;
+    }
+    return;
+  }
+
   if (currentPath === 'card-stats') {
     if (text.includes('Archetype Card Stats')) {
       if (handleDeckNameTranslation(text.match(/(.*?) Archetype Card Stats/))) return;
+    }
+    const deckCardStatsMatch = text.match(/^(.*?) Deck Card Stats \((Standard|Wild)\)$/);
+    if (deckCardStatsMatch) {
+      const deckName = generateDeckTranslation(deckCardStatsMatch[1]);
+      const format = deckCardStatsMatch[2] === 'Standard' ? '标准' : '狂野';
+      const translated = `${toPlainText(deckName)} 卡组卡牌统计（${format}）`;
+      titleElement.textContent = translated;
+      document.title = translated;
+      return;
     }
     const translation = uiTranslations.get(text);
     if (translation) {
@@ -76,6 +99,12 @@ export function handleTitle(): void {
     titleElement.textContent = translation;
     document.title = translation;
   }
+}
+
+function toPlainText(value: string): string {
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = value;
+  return tempDiv.textContent?.trim() || value;
 }
 
 export function handleSub(): void {
@@ -121,7 +150,9 @@ export function handleSub(): void {
     deck: {
       pattern: new RegExp(`^${BASE_URL}deck/(\\d+|[A-Za-z0-9+/=%]+)(?:\\?.*)?$`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
+        const timeSpan = element.querySelector(
+          'span.empty_agg_log_subtitle, span[phx-update="ignore"]',
+        );
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const editLink = element.querySelector(
           `a[href*="${ROUTES.DECK_BUILDER}"]`,
@@ -152,7 +183,9 @@ export function handleSub(): void {
     cardStatsDeck: {
       pattern: new RegExp(`^${BASE_URL}card-stats\\?deck_id=\\d+`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
+        const timeSpan = element.querySelector(
+          'span.empty_agg_log_subtitle, span[phx-update="ignore"]',
+        );
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
         const deckDetailLink = element.querySelector(
@@ -174,7 +207,9 @@ export function handleSub(): void {
     cardStatsArchetype: {
       pattern: new RegExp(`^${BASE_URL}card-stats\\?archetype=`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
+        const timeSpan = element.querySelector(
+          'span.empty_agg_log_subtitle, span[phx-update="ignore"]',
+        );
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const gamesText = extractGamesText(element);
         const cardStatsQueryLink = element.querySelector(
@@ -196,7 +231,9 @@ export function handleSub(): void {
     archetype: {
       pattern: new RegExp(`^${BASE_URL}archetype/[^/]+$`),
       handler: (element) => {
-        const timeSpan = element.querySelector('span.empty_agg_log_subtitle, span[phx-update="ignore"]');
+        const timeSpan = element.querySelector(
+          'span.empty_agg_log_subtitle, span[phx-update="ignore"]',
+        );
         const timeText = extractRelativeTimeText(timeSpan, uiTranslations);
         const cardStatsByArchLink = element.querySelector(
           `a[href*="${ROUTES.CARD_STATS_BY_ARCHETYPE}"]`,

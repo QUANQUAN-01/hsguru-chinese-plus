@@ -17,6 +17,7 @@ export function handleBasic(): void {
     'a.link',
     'a.twitter-follow-button',
     'button.button',
+    'p.tw-text-sm.tw-text-slate-300',
     'div.subtitle.is-4',
     'div.subtitle.is-5',
     'div.notification',
@@ -33,7 +34,14 @@ export function handleBasic(): void {
         return;
       }
       const translation = uiTranslations.get(text);
-      if (translation) element.textContent = translation;
+      if (translation) {
+        element.textContent = translation;
+        if (text === 'Post patch archetyping will be updated a couple days post patch') {
+          element
+            .closest('.tw-flex.tw-items-start.tw-border')
+            ?.classList.add('hsguru-post-patch-notice');
+        }
+      }
     });
   });
 }
