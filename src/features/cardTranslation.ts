@@ -1,5 +1,10 @@
 import { SELECTORS } from '../utils/constants';
-import { cardCache, saveCardTranslation, cacheCardImage } from '../utils/translationCache';
+import {
+  cardCache,
+  getCachedCardTranslation,
+  saveCardTranslation,
+  cacheCardImage,
+} from '../utils/translationCache';
 import {
   enqueueCardFetch,
   updateCardElement,
@@ -10,7 +15,30 @@ import {
 import { StorageManager, storageKey } from '../utils/storage';
 
 const CUSTOM_CARD_TRANSLATIONS_KEY = storageKey.customCard();
+const CARD_MISS_RETRY_DELAY = 24 * 60 * 60 * 1000;
+const CARD_MISS_VERSION = '4';
 let customCardTranslations: Record<string, string> | null = null;
+
+function clearLegacyCardMisses(): void {
+  if (localStorage.getItem(storageKey.cardMissVersion()) === CARD_MISS_VERSION) return;
+
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key?.startsWith('hsguru_card_miss_timestamp_')) {
+      localStorage.removeItem(key);
+    }
+  }
+  localStorage.setItem(storageKey.cardMissVersion(), CARD_MISS_VERSION);
+}
+
+function shouldRetryUnmatchedCard(name: string): boolean {
+  const missedAt = Number(localStorage.getItem(storageKey.cardMissTimestamp(name)));
+  return !missedAt || Date.now() - missedAt >= CARD_MISS_RETRY_DELAY;
+}
+
+function recordUnmatchedCard(name: string): void {
+  localStorage.setItem(storageKey.cardMissTimestamp(name), String(Date.now()));
+}
 
 export function loadCustomCardTranslations(): void {
   if (customCardTranslations) return;
@@ -64,17 +92,20 @@ function handleCardFetchResult(
   elements: Element[],
 ): void {
   if (result.found) {
+    localStorage.removeItem(storageKey.cardMissTimestamp(cardName));
     saveCardTranslation(cardName, result.translation);
     if (result.imageUrl) {
       cacheCardImage(cardName, result.imageUrl);
     }
   } else {
+    recordUnmatchedCard(cardName);
     addUnmatchedCardName(cardName);
   }
   elements.forEach((el) => updateCardElement(el as HTMLElement, result.translation, cardName));
 }
 
 export function handleCard(): void {
+  clearLegacyCardMisses();
   const cardNames = document.querySelectorAll(SELECTORS.CARD_NAME);
   const customCardTranslations2 = getCustomCardTranslations();
 
@@ -99,13 +130,15 @@ export function handleCard(): void {
       if (customTranslation) {
         cardCache.set(text, customTranslation);
         updateCardElement(element as HTMLElement, customTranslation, text);
-      } else {
-        (element as HTMLElement).dataset.cardTranslated = 'true';
+        return;
       }
-      return;
+      if (!shouldRetryUnmatchedCard(text)) {
+        (element as HTMLElement).dataset.cardTranslated = 'true';
+        return;
+      }
     }
 
-    const cachedTranslation = localStorage.getItem(storageKey.cardTranslation(text));
+    const cachedTranslation = getCachedCardTranslation(text);
     if (cachedTranslation) {
       cardCache.set(text, cachedTranslation);
       updateCardElement(element as HTMLElement, cachedTranslation, text);

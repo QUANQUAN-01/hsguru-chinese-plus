@@ -21,6 +21,15 @@ export const storageKey = {
   cardImage(cardName: string) {
     return `${STORAGE_PREFIX.CARD_IMAGE}${cardName}`;
   },
+  cardCacheTimestamp(cardName: string) {
+    return `${STORAGE_PREFIX.CARD_CACHE_TIMESTAMP}${cardName}`;
+  },
+  cardMissTimestamp(cardName: string) {
+    return `${STORAGE_PREFIX.CARD_MISS_TIMESTAMP}${cardName}`;
+  },
+  cardMissVersion() {
+    return STORAGE_PREFIX.CARD_MISS_VERSION;
+  },
   cacheMigrated() {
     return STORAGE_PREFIX.CACHE_MIGRATED;
   },

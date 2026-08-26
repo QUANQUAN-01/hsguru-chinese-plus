@@ -12,11 +12,20 @@ export interface CardTranslationResult {
   found: boolean;
 }
 
+function normalizeCardName(cardName: string): string {
+  return cardName
+    .toLowerCase()
+    .replace(/\bsi\s*:?\s*7\b/g, 'si')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
 export function fetchCardTranslation(
   cardName: string,
   callback: (result: CardTranslationResult) => void,
 ): void {
-  const encodedName = encodeURIComponent(cardName);
+  const normalizedName = normalizeCardName(cardName);
+  const encodedName = encodeURIComponent(normalizedName);
   const url = API.CARD_TRANSLATION;
   const body = `ignoreHero=1&name=${encodedName}&statistic=total&order=-series%2C%2Bmana&token=&page=0&size=30`;
 
@@ -39,7 +48,7 @@ export function fetchCardTranslation(
           if (data.success && data.data.total > 0) {
             const matchedCard = data.data.cards.find(
               (card: { ename: string; cname: string; img?: string; thumbnail?: string }) =>
-                card.ename === cardName,
+                normalizeCardName(card.ename) === normalizedName,
             );
             if (matchedCard) {
               translation = matchedCard.cname;

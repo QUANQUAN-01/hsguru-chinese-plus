@@ -369,6 +369,8 @@ export const staticPrefix: Record<string, string> = {
   Discolock: '弃牌术',
   CtA: '战斗号角',
   Seedlock: '任务术',
+  Shredslock: '撕裂术',
+  Sneaky: '潜行',
   Lynessa: '莱妮莎',
   Boar: '猪猪',
   Plague: '瘟疫',
@@ -458,6 +460,9 @@ export const STORAGE_PREFIX = {
   CUSTOM_CARD: 'hsguru_custom_card_names',
   CARD_TRANSLATION: 'hsguru_card_',
   CARD_IMAGE: 'hsguru_card_image_',
+  CARD_CACHE_TIMESTAMP: 'hsguru_card_cache_timestamp_',
+  CARD_MISS_TIMESTAMP: 'hsguru_card_miss_timestamp_',
+  CARD_MISS_VERSION: 'hsguru_card_miss_version',
   CACHE_MIGRATED: 'hsguru_cache_migrated',
   DATA_MIGRATED: 'hsguru_data_migrated',
 } as const;
