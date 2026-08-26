@@ -25,48 +25,64 @@ export function fetchCardTranslation(
   callback: (result: CardTranslationResult) => void,
 ): void {
   const normalizedName = normalizeCardName(cardName);
-  const encodedName = encodeURIComponent(normalizedName);
-  const url = API.CARD_TRANSLATION;
-  const body = `ignoreHero=1&name=${encodedName}&statistic=total&order=-series%2C%2Bmana&token=&page=0&size=30`;
+  const searchNames =
+    cardName.toLowerCase() === normalizedName ? [cardName] : [cardName, normalizedName];
+  let searchIndex = 0;
 
-  GM_xmlhttpRequest({
-    method: 'POST',
-    url,
-    headers: {
-      accept: '*/*',
-      'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-      Referer: 'https://www.iyingdi.com/',
-    },
-    data: body,
-    onload: (response) => {
-      let translation = cardName;
-      let imageUrl = '';
-      let found = false;
-      if (response.status === 200) {
-        try {
-          const data = JSON.parse(response.responseText);
-          if (data.success && data.data.total > 0) {
-            const matchedCard = data.data.cards.find(
+  const requestNextSearch = () => {
+    const encodedName = encodeURIComponent(searchNames[searchIndex]);
+    const body = `ignoreHero=1&name=${encodedName}&statistic=total&order=-series%2C%2Bmana&token=&page=0&size=30`;
+
+    GM_xmlhttpRequest({
+      method: 'POST',
+      url: API.CARD_TRANSLATION,
+      headers: {
+        accept: '*/*',
+        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        Referer: 'https://www.iyingdi.com/',
+      },
+      data: body,
+      onload: (response) => {
+        if (response.status === 200) {
+          try {
+            const data = JSON.parse(response.responseText);
+            const matchedCard = data.data?.cards?.find(
               (card: { ename: string; cname: string; img?: string; thumbnail?: string }) =>
                 normalizeCardName(card.ename) === normalizedName,
             );
-            if (matchedCard) {
-              translation = matchedCard.cname;
-              imageUrl = matchedCard.img || matchedCard.thumbnail || '';
-              found = true;
+            if (data.success && matchedCard) {
+              callback({
+                translation: matchedCard.cname,
+                imageUrl: matchedCard.img || matchedCard.thumbnail || '',
+                found: true,
+              });
+              return;
             }
+          } catch (e) {
+            console.error('[HSGuru] 解析卡牌翻译失败', e);
           }
-        } catch (e) {
-          console.error('[HSGuru] 解析卡牌翻译失败', e);
         }
-      }
-      callback({ translation, imageUrl, found });
-    },
-    onerror: () => {
-      console.error('[HSGuru] 卡牌翻译请求失败', cardName);
-      callback({ translation: cardName, imageUrl: '', found: false });
-    },
-  });
+
+        searchIndex++;
+        if (searchIndex < searchNames.length) {
+          requestNextSearch();
+        } else {
+          callback({ translation: cardName, imageUrl: '', found: false });
+        }
+      },
+      onerror: () => {
+        console.error('[HSGuru] 卡牌翻译请求失败', cardName);
+        searchIndex++;
+        if (searchIndex < searchNames.length) {
+          requestNextSearch();
+        } else {
+          callback({ translation: cardName, imageUrl: '', found: false });
+        }
+      },
+    });
+  };
+
+  requestNextSearch();
 }
 
 const pendingFetches = new Map<string, Element[]>();

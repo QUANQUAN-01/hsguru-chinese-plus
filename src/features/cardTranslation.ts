@@ -16,7 +16,7 @@ import { StorageManager, storageKey } from '../utils/storage';
 
 const CUSTOM_CARD_TRANSLATIONS_KEY = storageKey.customCard();
 const CARD_MISS_RETRY_DELAY = 24 * 60 * 60 * 1000;
-const CARD_MISS_VERSION = '4';
+const CARD_MISS_VERSION = '5';
 let customCardTranslations: Record<string, string> | null = null;
 
 function clearLegacyCardMisses(): void {
