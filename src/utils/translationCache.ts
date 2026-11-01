@@ -1,6 +1,8 @@
+import { STORAGE_PREFIX } from './constants';
 import { storageKey } from './storage';
 
 const CARD_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+const CARD_CACHE_VERSION = '1';
 
 function isCardCacheFresh(cardName: string): boolean {
   const cachedAt = Number(localStorage.getItem(storageKey.cardCacheTimestamp(cardName)));
@@ -107,4 +109,77 @@ export function saveCardTranslation(cardName: string, translation: string): void
   cardCache.set(cardName, translation);
   localStorage.setItem(storageKey.cardTranslation(cardName), translation);
   localStorage.setItem(storageKey.cardCacheTimestamp(cardName), String(Date.now()));
+}
+
+// ============================================================
+// Cache Version
+// ============================================================
+
+function isCardResourceKey(key: string): boolean {
+  if (key === storageKey.cardCacheVersion() || key === storageKey.cardMissVersion()) return false;
+  return (
+    key.startsWith(STORAGE_PREFIX.CARD_TRANSLATION) ||
+    key.startsWith(STORAGE_PREFIX.CARD_IMAGE) ||
+    key.startsWith(STORAGE_PREFIX.CARD_CACHE_TIMESTAMP) ||
+    key.startsWith(STORAGE_PREFIX.CARD_ERROR_TIMESTAMP) ||
+    key.startsWith(STORAGE_PREFIX.CARD_MISS_TIMESTAMP)
+  );
+}
+
+function isCardCacheEntryKey(key: string): boolean {
+  return isCardResourceKey(key) && !key.startsWith(STORAGE_PREFIX.CARD_MISS_TIMESTAMP);
+}
+
+function clearCardCacheStorage(): void {
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && isCardCacheEntryKey(key)) {
+      localStorage.removeItem(key);
+    }
+  }
+  cardCache.clear();
+  cardImageCache.clear();
+}
+
+/**
+ * 手动清空全部卡牌资源缓存（翻译、图片、时间戳、失败/未命中冷却）。
+ * 不删除自定义翻译，也不改动缓存版本号。
+ * @returns 删除的 localStorage 条目数
+ */
+export function clearAllCardResources(): number {
+  let removed = 0;
+  for (let i = localStorage.length - 1; i >= 0; i--) {
+    const key = localStorage.key(i);
+    if (key && isCardResourceKey(key)) {
+      localStorage.removeItem(key);
+      removed++;
+    }
+  }
+  cardCache.clear();
+  cardImageCache.clear();
+  translationCache.clear();
+  return removed;
+}
+
+/**
+ * 翻译缓存版本变更时清空旧翻译/图片/时间戳。
+ * 首次运行（没有版本键）只登记版本，避免升级后全量重新请求。
+ */
+export function ensureCardCacheVersion(): void {
+  let storedVersion: string | null;
+  try {
+    storedVersion = localStorage.getItem(storageKey.cardCacheVersion());
+  } catch (e) {
+    console.warn('[HSGuru] 读取卡牌缓存版本失败', e);
+    return;
+  }
+
+  if (storedVersion === CARD_CACHE_VERSION) return;
+  if (storedVersion) clearCardCacheStorage();
+
+  try {
+    localStorage.setItem(storageKey.cardCacheVersion(), CARD_CACHE_VERSION);
+  } catch (e) {
+    console.warn('[HSGuru] 写入卡牌缓存版本失败', e);
+  }
 }

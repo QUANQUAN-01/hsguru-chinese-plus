@@ -12,6 +12,7 @@ import {
   deleteCustomCardTranslation,
   saveCustomCardTranslations,
 } from './cardTranslation';
+import { clearAllCardResources } from '../utils/translationCache';
 
 // ============================================================
 // Helper Functions
@@ -354,6 +355,7 @@ export function createConfigModal(): void {
       background: #faf9f5;
       border-top: 1px solid #e8e6dc;
       display: flex;
+      flex-wrap: wrap;
       justify-content: flex-end;
       gap: 12px;
     }
@@ -398,6 +400,15 @@ export function createConfigModal(): void {
     .hsguru-btn-success:hover {
       background: #1f1f1d;
       box-shadow: 0 0 0 1px rgba(48, 48, 46, 0.24);
+    }
+    .hsguru-btn-danger {
+      background: #fff5f2;
+      color: #b23b2e;
+      border-color: #e7b8ae;
+    }
+    .hsguru-btn-danger:hover {
+      background: #ffe9e3;
+      box-shadow: 0 0 0 1px #d99a8d;
     }
 
     .hsguru-input {
@@ -785,6 +796,15 @@ export function createConfigModal(): void {
   saveBtn.id = 'hsguru-save-config';
   saveBtn.textContent = '保存并刷新';
 
+  const refreshResourcesBtn = document.createElement('button');
+  refreshResourcesBtn.type = 'button';
+  refreshResourcesBtn.className = 'hsguru-btn hsguru-btn-danger';
+  refreshResourcesBtn.id = 'hsguru-refresh-resources';
+  refreshResourcesBtn.textContent = '刷新全部资源';
+  refreshResourcesBtn.title = '删除所有卡牌翻译与卡牌图缓存并重新请求（不会删除自定义翻译）';
+  (refreshResourcesBtn as HTMLElement).style.marginRight = 'auto';
+
+  footer.appendChild(refreshResourcesBtn);
   footer.appendChild(cancelBtn);
   footer.appendChild(saveBtn);
 
@@ -839,6 +859,7 @@ function bindConfigModalEvents(): void {
   const closeBtn = document.getElementById('hsguru-close-config');
   const cancelBtn = document.getElementById('hsguru-cancel-config');
   const saveBtn = document.getElementById('hsguru-save-config');
+  const refreshResourcesBtn = document.getElementById('hsguru-refresh-resources');
   const tabs = modal.querySelectorAll('.hsguru-tab-item');
   const contents = modal.querySelectorAll('.hsguru-tab-content');
 
@@ -1064,6 +1085,19 @@ function bindConfigModalEvents(): void {
     (saveBtn as HTMLElement).onclick = () => {
       saveCurrentConfig();
       saveCustomTranslationsFromUI();
+      location.reload();
+    };
+  }
+
+  if (refreshResourcesBtn) {
+    (refreshResourcesBtn as HTMLElement).onclick = () => {
+      const confirmed = window.confirm(
+        '确定要刷新全部资源吗？\n\n将删除所有卡牌翻译和卡牌图缓存并重新请求。\n不会删除自定义翻译，未保存的配置修改会丢失。',
+      );
+      if (!confirmed) return;
+
+      const removed = clearAllCardResources();
+      console.log(`[HSGuru] 已清理 ${removed} 条卡牌缓存，页面即将刷新并重新请求`);
       location.reload();
     };
   }

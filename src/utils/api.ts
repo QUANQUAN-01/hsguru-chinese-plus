@@ -10,6 +10,12 @@ export interface CardTranslationResult {
   translation: string;
   imageUrl: string;
   found: boolean;
+  /**
+   * 请求本身失败（网络错误 / 非 200 / 响应解析失败）。
+   * 用于区分「接口正常返回但查不到该卡牌」和「这次请求没成功」，
+   * 后者不应写入 24 小时的未命中缓存。
+   */
+  requestFailed?: boolean;
 }
 
 function normalizeCardName(cardName: string): string {
@@ -28,58 +34,73 @@ export function fetchCardTranslation(
   const searchNames =
     cardName.toLowerCase() === normalizedName ? [cardName] : [cardName, normalizedName];
   let searchIndex = 0;
+  let sawValidResponse = false;
+
+  const finish = () => {
+    callback({
+      translation: cardName,
+      imageUrl: '',
+      found: false,
+      requestFailed: !sawValidResponse,
+    });
+  };
 
   const requestNextSearch = () => {
     const encodedName = encodeURIComponent(searchNames[searchIndex]);
     const body = `ignoreHero=1&name=${encodedName}&statistic=total&order=-series%2C%2Bmana&token=&page=0&size=30`;
 
-    GM_xmlhttpRequest({
-      method: 'POST',
-      url: API.CARD_TRANSLATION,
-      headers: {
-        accept: '*/*',
-        'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        Referer: 'https://www.iyingdi.com/',
-      },
-      data: body,
-      onload: (response) => {
-        if (response.status === 200) {
-          try {
-            const data = JSON.parse(response.responseText);
-            const matchedCard = data.data?.cards?.find(
-              (card: { ename: string; cname: string; img?: string; thumbnail?: string }) =>
-                normalizeCardName(card.ename) === normalizedName,
-            );
-            if (data.success && matchedCard) {
-              callback({
-                translation: matchedCard.cname,
-                imageUrl: matchedCard.img || matchedCard.thumbnail || '',
-                found: true,
-              });
-              return;
-            }
-          } catch (e) {
-            console.error('[HSGuru] 解析卡牌翻译失败', e);
-          }
-        }
+    const nextOrFinish = () => {
+      searchIndex++;
+      if (searchIndex < searchNames.length) {
+        requestNextSearch();
+      } else {
+        finish();
+      }
+    };
 
-        searchIndex++;
-        if (searchIndex < searchNames.length) {
-          requestNextSearch();
-        } else {
-          callback({ translation: cardName, imageUrl: '', found: false });
-        }
-      },
-      onerror: () => {
-        console.error('[HSGuru] 卡牌翻译请求失败', cardName);
-        searchIndex++;
-        if (searchIndex < searchNames.length) {
-          requestNextSearch();
-        } else {
-          callback({ translation: cardName, imageUrl: '', found: false });
-        }
-      },
-    });
+    try {
+      GM_xmlhttpRequest({
+        method: 'POST',
+        url: API.CARD_TRANSLATION,
+        headers: {
+          accept: '*/*',
+          'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+          Referer: 'https://www.iyingdi.com/',
+        },
+        data: body,
+        onload: (response) => {
+          if (response.status === 200) {
+            try {
+              const data = JSON.parse(response.responseText);
+              sawValidResponse = true;
+              const matchedCard = data.data?.cards?.find(
+                (card: { ename: string; cname: string; img?: string; thumbnail?: string }) =>
+                  normalizeCardName(card.ename) === normalizedName,
+              );
+              if (data.success && matchedCard) {
+                callback({
+                  translation: matchedCard.cname,
+                  imageUrl: matchedCard.img || matchedCard.thumbnail || '',
+                  found: true,
+                });
+                return;
+              }
+            } catch (e) {
+              console.error('[HSGuru] 解析卡牌翻译失败', e);
+            }
+          }
+
+          nextOrFinish();
+        },
+        onerror: () => {
+          console.error('[HSGuru] 卡牌翻译请求失败', cardName);
+          nextOrFinish();
+        },
+      });
+    } catch (e) {
+      console.error('[HSGuru] 卡牌翻译请求异常', cardName, e);
+      nextOrFinish();
+    }
   };
 
   requestNextSearch();

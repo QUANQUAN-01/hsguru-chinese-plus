@@ -462,7 +462,9 @@ export const STORAGE_PREFIX = {
   CARD_IMAGE: 'hsguru_card_image_',
   CARD_CACHE_TIMESTAMP: 'hsguru_card_cache_timestamp_',
   CARD_MISS_TIMESTAMP: 'hsguru_card_miss_timestamp_',
+  CARD_ERROR_TIMESTAMP: 'hsguru_card_error_timestamp_',
   CARD_MISS_VERSION: 'hsguru_card_miss_version',
+  CARD_CACHE_VERSION: 'hsguru_card_cache_version',
   CACHE_MIGRATED: 'hsguru_cache_migrated',
   DATA_MIGRATED: 'hsguru_data_migrated',
 } as const;

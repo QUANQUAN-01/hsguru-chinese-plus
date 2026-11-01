@@ -16,6 +16,7 @@ import { StorageManager, storageKey } from '../utils/storage';
 
 const CUSTOM_CARD_TRANSLATIONS_KEY = storageKey.customCard();
 const CARD_MISS_RETRY_DELAY = 24 * 60 * 60 * 1000;
+const CARD_ERROR_RETRY_DELAY = 2 * 60 * 1000;
 const CARD_MISS_VERSION = '5';
 let customCardTranslations: Record<string, string> | null = null;
 
@@ -38,6 +39,15 @@ function shouldRetryUnmatchedCard(name: string): boolean {
 
 function recordUnmatchedCard(name: string): void {
   localStorage.setItem(storageKey.cardMissTimestamp(name), String(Date.now()));
+}
+
+function shouldRetryErroredCard(name: string): boolean {
+  const failedAt = Number(localStorage.getItem(storageKey.cardErrorTimestamp(name)));
+  return !failedAt || Date.now() - failedAt >= CARD_ERROR_RETRY_DELAY;
+}
+
+function recordErroredCard(name: string): void {
+  localStorage.setItem(storageKey.cardErrorTimestamp(name), String(Date.now()));
 }
 
 export function loadCustomCardTranslations(): void {
@@ -93,11 +103,17 @@ function handleCardFetchResult(
 ): void {
   if (result.found) {
     localStorage.removeItem(storageKey.cardMissTimestamp(cardName));
+    localStorage.removeItem(storageKey.cardErrorTimestamp(cardName));
     saveCardTranslation(cardName, result.translation);
     if (result.imageUrl) {
       cacheCardImage(cardName, result.imageUrl);
     }
+  } else if (result.requestFailed) {
+    // 网络/服务暂时不可用：不写入未命中缓存，保留元素未翻译状态，冷却后自动重试。
+    recordErroredCard(cardName);
+    return;
   } else {
+    localStorage.removeItem(storageKey.cardErrorTimestamp(cardName));
     recordUnmatchedCard(cardName);
     addUnmatchedCardName(cardName);
   }
@@ -144,6 +160,8 @@ export function handleCard(): void {
       updateCardElement(element as HTMLElement, cachedTranslation, text);
       return;
     }
+
+    if (!shouldRetryErroredCard(text)) return;
 
     if (isCardPending(text)) {
       addPendingElement(text, element);

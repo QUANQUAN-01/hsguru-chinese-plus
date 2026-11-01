@@ -1,4 +1,5 @@
 import { migrateLegacyData, migrateLegacyCardCache } from './utils/storage';
+import { ensureCardCacheVersion } from './utils/translationCache';
 import { queryCache } from './utils/dom';
 import { injectStyles } from './features/styles';
 import { FEATURES } from './utils/constants';
@@ -306,6 +307,7 @@ function schedulePluginInitialization() {
   }
 }
 function initializePlugin(): void {
+  ensureCardCacheVersion();
   migrateLegacyData();
   migrateLegacyCardCache();
 

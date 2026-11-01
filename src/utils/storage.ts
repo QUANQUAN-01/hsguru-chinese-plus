@@ -27,8 +27,14 @@ export const storageKey = {
   cardMissTimestamp(cardName: string) {
     return `${STORAGE_PREFIX.CARD_MISS_TIMESTAMP}${cardName}`;
   },
+  cardErrorTimestamp(cardName: string) {
+    return `${STORAGE_PREFIX.CARD_ERROR_TIMESTAMP}${cardName}`;
+  },
   cardMissVersion() {
     return STORAGE_PREFIX.CARD_MISS_VERSION;
+  },
+  cardCacheVersion() {
+    return STORAGE_PREFIX.CARD_CACHE_VERSION;
   },
   cacheMigrated() {
     return STORAGE_PREFIX.CACHE_MIGRATED;
@@ -116,6 +122,7 @@ export function migrateLegacyCardCache(): void {
       const value = localStorage.getItem(key);
       if (value && typeof value === 'string' && value.length > 0) {
         localStorage.setItem(getCardCacheKey(key), value);
+        localStorage.setItem(storageKey.cardCacheTimestamp(key), String(Date.now()));
         localStorage.removeItem(key);
         migratedCount++;
       }
